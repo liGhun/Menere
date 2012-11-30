@@ -1,0 +1,12 @@
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.dll.config
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.dll
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.pdb
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.dll
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.pdb
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.xml
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ResolveAssemblyReference.cache
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.Resources.resources
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\GenerateResource.read.1.tlog
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\GenerateResource.write.1.tlog
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.dll
+D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.pdb

@@ -1,0 +1,39 @@
+﻿<Window x:Class="Menere.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Meneré" Height="532" Width="726"
+        xmlns:WinForms="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+        xmlns:controls="clr-namespace:Menere.Controls" 
+        xmlns:models="clr-namespace:ReaderSharp.Model;assembly=ReaderSharp" 
+        >
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Name="stackpanelMainButtonBar" Orientation="Horizontal" Grid.Column="0">
+                <Button Name="buttonUpdateAll" Content="Update all" Click="buttonUpdateAll_Click" />
+                <Button Name="buttonChangeFeedList" Content="Unread" Click="buttonChangeFeedList_Click" />
+            </StackPanel>
+            <ListBox Name="listBoxFeeds" Grid.Row="1" SelectionChanged="listBoxFeeds_SelectionChanged" SelectionMode="Single">
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type models:Feed}">
+                        <controls:ItemBox x:Name="feedBox" HorizontalAlignment="Stretch" Width="180" DataContext="{Binding}" />
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>
+        </Grid>
+        <ListBox Name="listBoxItems" DataContext="{Binding ElementName=listBoxFeeds, Path=SelectedItem}" ItemsSource="{Binding Path=UnreadItems}" Grid.Column="1" SelectionChanged="listBoxItems_SelectionChanged">
+            
+        </ListBox>
+        <Grid Name="WebkitBrowserGrid" Grid.Column="2" />
+       
+       
+    </Grid>
+</Window>

@@ -1,0 +1,12 @@
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\ResolveAssemblyReference.cache
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\SharpReader.Resources.resources
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\GenerateResource.read.1.tlog
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\GenerateResource.write.1.tlog
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\SharpReader.dll.config
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\SharpReader.dll
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\SharpReader.pdb
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\Newtonsoft.Json.dll
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\Newtonsoft.Json.pdb
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\bin\Release\Newtonsoft.Json.xml
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\SharpReader.dll
+d:\users\walthers\documents\Visual Studio 2010\Projects\Menere\SharpReader\obj\Release\SharpReader.pdb
