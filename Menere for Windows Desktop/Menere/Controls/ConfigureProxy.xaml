@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="Menere.Controls.ConfigureProxy"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" d:DesignWidth="300"
+             Background="{DynamicResource ResourceKey=color_main_background}"
+            Foreground="{DynamicResource ResourceKey=color_main_foreground}"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" Height="183.469">
+    <Grid>
+        <CheckBox Name="checkbox_enable_proxy" Content="Enable proxy" Margin="10,10,10,0" VerticalAlignment="Top" Background="{DynamicResource ResourceKey=color_main_background}" Foreground="{DynamicResource ResourceKey=color_main_foreground}" Checked="checkbox_enable_proxy_Checked" Unchecked="checkbox_enable_proxy_Unchecked" />
+        <Grid Name="grid_proxy_settings" Margin="0,31,0,0" Visibility="Collapsed">
+            <TextBlock HorizontalAlignment="Left" Margin="10,12,0,0" TextWrapping="Wrap" Text="Proxy server" VerticalAlignment="Top" Width="90" TextAlignment="Right"/>
+            <TextBox Name="textbox_proxy_server" Height="23" Margin="105,10,10,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="10,42,0,0" TextWrapping="Wrap" Text="Proxy port" VerticalAlignment="Top" Width="90" TextAlignment="Right"/>
+            <xctk:IntegerUpDown Name="integerUpDown_proxy_port" Text="3128" Margin="105,40,0,0" Width="60" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <TextBox Name="textbox_proxy_username" Height="23" Margin="105,64,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="10,67,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" Width="90" TextAlignment="Right"/>
+            <PasswordBox Name="passwordbox_proxy_password" Height="23" Margin="105,92,10,0" Password=""  VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" Margin="10,94,0,0"  TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Width="90" TextAlignment="Right"/>
+            <Button Name="button_apply" Click="button_apply_Click" Content="Apply" HorizontalAlignment="Right" Margin="0,0,10,10.2" VerticalAlignment="Bottom" Width="75"/>
+        </Grid>
+    </Grid>
+</UserControl>

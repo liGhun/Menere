@@ -1,0 +1,5 @@
+0.3.2
+Changed account saving code (not on decontrutor but on account changes)
+
+0.3.1
+First public beta

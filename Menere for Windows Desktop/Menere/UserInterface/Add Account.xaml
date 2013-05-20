@@ -1,0 +1,28 @@
+﻿<Window x:Class="Menere.UserInterface.Add_Account"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add_Account" Height="650" Width="300"
+        xmlns:controls="clr-namespace:Menere.Controls"
+        xmlns:model="clr-namespace:Menere.Model"
+        Background="{DynamicResource ResourceKey=color_main_background}"
+        Foreground="{DynamicResource ResourceKey=color_main_foreground}">
+    <Grid>
+        <Grid.Resources>
+            <!--<DataTemplate DataType="{x:Type model:FeverAccount}">
+                <controls:AccountListboxForAdding x:Name="account" HorizontalAlignment="Stretch" DataContext="{Binding}" Margin="0,0,6,0" />
+            </DataTemplate> -->
+        </Grid.Resources>
+        <StackPanel Orientation="Vertical">
+            <TextBlock Margin="10" TextWrapping="Wrap" Text="Add new account" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" FontSize="20"/>
+
+            <ListBox Name="listbox_accounts" Margin="10,0,10,0" HorizontalContentAlignment="Center" Background="{DynamicResource ResourceKey=color_main_background}" Foreground="{DynamicResource ResourceKey=color_main_foreground}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <controls:AccountListboxForAdding x:Name="account" HorizontalAlignment="Stretch" DataContext="{Binding}" Margin="0,6,0,6" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <controls:ConfigureProxy Margin="0,0,0,10" VerticalAlignment="Bottom" />
+        </StackPanel>
+    </Grid>
+</Window>

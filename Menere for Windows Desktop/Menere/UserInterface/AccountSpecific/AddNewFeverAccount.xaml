@@ -1,0 +1,30 @@
+﻿<Window x:Class="Menere.UserInterface.AccountSpecific.AddNewFeverAccount"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AddNewFeverAccount" Height="144.923" Width="409.846"
+        Padding="6" Background="{DynamicResource ResourceKey=color_main_background}"
+        Foreground="{DynamicResource ResourceKey=color_main_foreground}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120" />
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Name="textblock_url" Text="Url of your Fever" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBlock Name="textblock_username" Text="Username (Email)" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        <TextBlock Name="textblock_password" Text="Password" Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        
+        <TextBox Name="textbox_url" Text="http://" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" />
+        <TextBox Name="textbox_username" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center" />
+        <PasswordBox Name="passwordbox_password" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" />
+        
+        <Button Name="button_add" Content="Add account" Click="button_add_Click" Grid.Column="2" Grid.Row="3" />
+        <Button Name="button_cancel" Content="Cancel" Click="button_cancel_Click" Grid.Column="0" Grid.Row="3" />
+    </Grid>
+</Window>

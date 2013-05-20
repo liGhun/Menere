@@ -332,3 +332,6 @@ D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\Fee
 D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\ItemBox.g.cs
 D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
 D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere_MarkupCompile.lref
+C:\Users\WaltherS\Documents\Development\Menere\Menere\bin\Debug\Menere.exe.config
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere.exe
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere.pdb
