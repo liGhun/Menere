@@ -16,6 +16,7 @@ namespace Menere.Model
         ObservableCollection<IItem> items { get; set; }
         IAccount receiving_account { get; set; }
         string icon_base64 { get; set; }
+        string icon_path { get; set; }
 
         void update_items();
         void mark_all_items_read();

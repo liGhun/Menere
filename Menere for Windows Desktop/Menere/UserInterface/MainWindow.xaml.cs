@@ -13,8 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Reflection;
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using Menere.Model;
 
 namespace Menere.UserInterface
 {
@@ -24,27 +26,33 @@ namespace Menere.UserInterface
     public partial class MainWindow : Window
     {
 
-        public Model.FeverAccount account;
+        public Model.IAccount account;
         
         public DispatcherTimer update_timer;
         public string current_filter_string { get; set; }
         public Model.IFeed current_filter_feed { get; set; }
+        public Model.IFolder current_filter_folder { get; set; }
+        private int last_selected_index { get; set; }
         
         public MainWindow()
         {
             InitializeComponent();
 
-            account = AppController.accounts[0] as Model.FeverAccount;
-            listbox_feeds.ItemsSource = account.feeds;
+            combobox_accounts.Visibility = System.Windows.Visibility.Collapsed;
+            button_remove_feed_filter.Visibility = System.Windows.Visibility.Collapsed;
+            button_remove_folder_filter.Visibility = System.Windows.Visibility.Collapsed;
 
-            
+            account = AppController.Current.current_account as Model.IAccount;
+            listbox_feeds.ItemsSource = account.feeds;
+            listbox_groups.ItemsSource = account.groups;
+            listbox_items.Items.SortDescriptions.Add(new SortDescription("created", ListSortDirection.Ascending));
             listbox_items.ItemsSource = account.items;
             account.items.CollectionChanged += unread_items_CollectionChanged;
             webbrowser.Navigated += webbrowser_Navigated;
             textblock_item_title.Text = "";
             Button_Click(null, null);
 
-            filter_feeds();
+           // filter_feeds();
 
             update_timer = new DispatcherTimer();
             update_timer.Tick +=update_timer_Tick;
@@ -59,28 +67,23 @@ namespace Menere.UserInterface
 
         void unread_items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            textblock_header_unread_items.Text = string.Format("Unread items ({0})", account.items.Count());
-            filter_feeds();
+            update_header_items();
+            if (AppController.Current.current_account.initial_fetch_completed)
+            {
+                filter_feeds();
+                filter_items();
+                
+            }
         }
-
+        private void update_header_items()
+        {
+            textblock_header_unread_items.Text = string.Format("Unread items ({0})", listbox_items.Items.Count);
+        }
         
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             
-           // SharpFever.Model.FeverResponse feeds = account.get_feeds();
-           // listbox_feeds.ItemsSource = feeds.feeds;
-
-      //      List<uint> ids = new List<uint>();
-      //      ids.Add(25041);
-      //      SharpFever.Model.FeverResponse items = account.get_items(with_ids:ids);
-      //      listbox_items.ItemsSource = items.items;
-
-           //  SharpFever.Model.FeverResponse groups = account.get_groups();
-           //  listbox_groups.ItemsSource = groups.groups;
-           //  SharpFever.Model.FeverResponse favicons = account.get_favicons();
-           // System.Drawing.Image image = favicons.favicons.First().image;
-
             button_refresh_Click(null, null);
 
         }
@@ -90,9 +93,15 @@ namespace Menere.UserInterface
             Model.IItem item = listbox_items.SelectedItem as Model.IItem;
             if (item == null && listbox_items.Items.Count > 0)
             {
-                listbox_items.SelectedIndex = 0;
+                listbox_items.SelectedIndex = Math.Min(last_selected_index,Math.Max(0, listbox_items.Items.Count - 1));
                 return;
             }
+
+            if (listbox_items.SelectedItem != null)
+            {
+                last_selected_index = Math.Max(0, listbox_items.SelectedIndex);
+            }
+
             if (item != null)
             {
                 textblock_item_title.Text = item.title;
@@ -138,12 +147,15 @@ namespace Menere.UserInterface
 
         private void button_refresh_Click(object sender, RoutedEventArgs e)
         {
-            account.update_all_feeds();
+            foreach (IAccount account_available in AppController.accounts)
+            {
+                account_available.update_all_feeds();
+            }
         }
 
         private string create_html_content(Model.IItem item)
         {
-            SolidColorBrush background = System.Windows.Application.Current.Resources["color_main_background"] as SolidColorBrush;
+            SolidColorBrush background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
             SolidColorBrush text_color = System.Windows.Application.Current.Resources["color_main_foreground"] as SolidColorBrush;
             SolidColorBrush link_color = System.Windows.Application.Current.Resources["color_link"] as SolidColorBrush;
             string back_string = "#" + background.ToString().Substring(3);
@@ -227,6 +239,38 @@ namespace Menere.UserInterface
         private void listbox_feeds_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             current_filter_feed = listbox_feeds.SelectedItem as Model.IFeed;
+            if (current_filter_feed == null)
+            {
+                button_remove_feed_filter.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                button_remove_feed_filter.Visibility = System.Windows.Visibility.Visible;
+            }
+
+            filter_items();
+            update_header_items();
+        }
+
+        private void listbox_groups_SelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            current_filter_folder = listbox_groups.SelectedItem as Model.IFolder;
+            if (current_filter_folder == null)
+            {
+                button_remove_folder_filter.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                button_remove_folder_filter.Visibility = System.Windows.Visibility.Visible;
+            }
+            listbox_feeds.SelectedItem = null;
+            update_all_filter();
+            update_header_items();
+        }
+
+        public void update_all_filter()
+        {
+            filter_feeds();
             filter_items();
         }
 
@@ -250,7 +294,21 @@ namespace Menere.UserInterface
                        {
                            return false;
                        }
-                       return true;
+                       if (current_filter_folder != null)
+                       {
+                           if (current_filter_folder.feeds.Contains(feed))
+                           {
+                               return true;
+                           }
+                           else
+                           {
+                               return false;
+                           }
+                       }
+                       else
+                       {
+                           return true;
+                       }
                    }
                    catch
                    {
@@ -272,11 +330,19 @@ namespace Menere.UserInterface
 
                    bool feed_filter = true;
                    bool string_filter = true;
+                   bool folder_filter = true;
                    if (current_filter_feed != null)
                    {
                        if (current_filter_feed.id != item.feed_id)
                        {
                            feed_filter = false;
+                       }
+                   }
+                   if (current_filter_folder != null)
+                   {
+                       if (!current_filter_folder.feeds.Contains(item.feed))
+                       {
+                           folder_filter = false;
                        }
                    }
 
@@ -285,7 +351,7 @@ namespace Menere.UserInterface
                        string_filter = (item.title.ToLower().Contains(current_filter_string.ToLower()) || item.html.ToLower().Contains(current_filter_string.ToLower()));
                    }
 
-                   return (feed_filter && string_filter);
+                   return (feed_filter && string_filter && folder_filter);
                };
         }
 
@@ -299,6 +365,49 @@ namespace Menere.UserInterface
             current_filter_string = textbox_filter_text.Text;
             filter_items();
         }
+
+        private void button_add_account_Click(object sender, RoutedEventArgs e)
+        {
+            UserInterface.Add_Account add_account = new Add_Account();
+            add_account.Show();
+        }
+
+        private void button_remove_folder_filter_Click(object sender, RoutedEventArgs e)
+        {
+            ClearTreeViewItemsControlSelection(listbox_groups.Items, listbox_groups.ItemContainerGenerator);
+        }
+
+        private static void ClearTreeViewItemsControlSelection(ItemCollection ic, ItemContainerGenerator icg)
+        {
+            if ((ic != null) && (icg != null))
+            {
+                for (int i = 0; i < ic.Count; i++)
+                {
+                    TreeViewItem tvi = icg.ContainerFromIndex(i) as TreeViewItem;
+                    if (tvi != null)
+                    {
+                        ClearTreeViewItemsControlSelection(tvi.Items, tvi.ItemContainerGenerator);
+                        tvi.IsSelected = false;
+                    }
+                }
+            }
+        }
+
+        private void combobox_accounts_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            IAccount chosen_account = combobox_accounts.SelectedItem as IAccount;
+            if (chosen_account != null)
+            {
+                AppController.Current.current_account = chosen_account;
+                account = chosen_account;
+                this.textblock_foldername.Text = account.folder_name;
+                listbox_items.ItemsSource = account.items;
+                listbox_feeds.ItemsSource = account.feeds;
+                listbox_groups.ItemsSource = account.groups;
+                update_header_items();
+            }
+        }
+
         
     }
 }

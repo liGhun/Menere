@@ -28,8 +28,8 @@
     <SupportUrl>http://www.li-ghun.de/</SupportUrl>
     <ProductName>Meneré</ProductName>
     <PublisherName>lI%27 Ghun %28Sven Walther%29</PublisherName>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.3.2.%2a</ApplicationVersion>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>0.4.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -84,6 +84,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Printing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -98,11 +99,25 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Xceed.Wpf.DataGrid">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.1.9.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
     </Reference>
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\packages\Extended.Wpf.Toolkit.1.9.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.DataGrid, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.DataGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=2.0.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Extended.Wpf.Toolkit.2.0.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +130,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ConfigureProxy.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FeedBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FolderBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,13 +172,25 @@
     <Compile Include="Controls\ConfigureProxy.xaml.cs">
       <DependentUpon>ConfigureProxy.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\FeedBox.xaml.cs">
+      <DependentUpon>FeedBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FolderBox.xaml.cs">
+      <DependentUpon>FolderBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ItemBox.xaml.cs">
       <DependentUpon>ItemBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\Base64ImageConverter.cs" />
+    <Compile Include="Converters\ItemWidthConverter.cs" />
     <Compile Include="Helper\Crypto.cs" />
+    <Compile Include="Helper\Images.cs" />
     <Compile Include="Model\CommaFeedAccount.cs" />
     <Compile Include="Model\FeedbinAccount.cs" />
     <Compile Include="Model\FeedlyAccount.cs" />
+    <Compile Include="Model\FeedlyFeed.cs" />
+    <Compile Include="Model\FeedlyFolder.cs" />
+    <Compile Include="Model\FeedlyItem.cs" />
     <Compile Include="Model\FeverFeed.cs" />
     <Compile Include="Model\FeverFolder.cs" />
     <Compile Include="Model\IFolder.cs" />
@@ -214,6 +249,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RSSharp\RSSharp.csproj">
+      <Project>{2019528e-46c3-4fcb-aaf0-75bea2295435}</Project>
+      <Name>RSSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SharpFever\SharpFever.csproj">
       <Project>{0485c5ec-c42f-4b12-ad2f-55fcbbf07df3}</Project>
       <Name>SharpFever</Name>
@@ -264,6 +303,426 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ButtonsDark\glyphicons_000_glass.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_001_leaf.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_002_dog.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_003_user.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_004_girl.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_005_car.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_006_user_add.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_007_user_remove.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_008_film.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_009_magic.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_010_envelope.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_011_camera.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_012_heart.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_013_beach_umbrella.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_014_train.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_015_print.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_016_bin.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_017_music.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_018_note.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_019_heart_empty.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_020_home.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_021_snowflake.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_022_fire.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_023_magnet.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_024_parents.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_025_binoculars.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_026_road.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_027_search.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_028_cars.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_029_notes_2.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_030_pencil.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_031_bus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_032_wifi_alt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_033_luggage.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_034_old_man.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_035_woman.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_036_file.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_037_coins.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_038_airplane.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_039_notes.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_040_stats.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_041_charts.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_042_pie_chart.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_043_group.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_044_keys.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_045_calendar.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_046_router.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_047_camera_small.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_048_dislikes.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_049_star.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_050_link.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_051_eye_open.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_052_eye_close.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_053_alarm.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_054_clock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_055_stopwatch.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_056_projector.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_057_history.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_058_truck.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_059_cargo.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_060_compass.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_061_keynote.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_062_paperclip.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_063_power.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_064_lightbulb.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_065_tag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_066_tags.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_067_cleaning.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_068_ruller.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_069_gift.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_070_umbrella.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_071_book.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_072_bookmark.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_073_wifi.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_074_cup.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_075_stroller.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_076_headphones.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_077_headset.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_078_warning_sign.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_079_signal.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_080_retweet.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_081_refresh.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_082_roundabout.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_083_random.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_084_heat.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_085_repeat.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_086_display.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_087_log_book.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_088_adress_book.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_089_building.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_090_eyedropper.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_091_adjust.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_092_tint.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_093_crop.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_094_vector_path_square.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_095_vector_path_circle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_096_vector_path_polygon.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_097_vector_path_line.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_098_vector_path_curve.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_099_vector_path_all.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_100_font.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_101_italic.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_102_bold.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_103_text_underline.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_104_text_strike.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_105_text_height.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_106_text_width.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_107_text_resize.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_108_left_indent.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_109_right_indent.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_110_align_left.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_111_align_center.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_112_align_right.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_113_justify.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_114_list.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_115_text_smaller.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_116_text_bigger.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_117_embed.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_118_embed_close.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_119_table.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_120_message_full.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_121_message_empty.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_122_message_in.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_123_message_out.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_124_message_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_125_message_minus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_126_message_ban.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_127_message_flag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_128_message_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_129_message_new.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_130_inbox.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_131_inbox_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_132_inbox_minus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_133_inbox_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_134_inbox_in.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_135_inbox_out.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_136_cogwheel.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_137_cogwheels.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_138_picture.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_139_adjust_alt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_140_database_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_141_database_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_142_database_minus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_143_database_ban.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_144_folder_open.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_145_folder_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_146_folder_minus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_147_folder_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_148_folder_flag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_149_folder_new.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_150_edit.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_151_new_window.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_152_check.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_153_unchecked.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_154_more_windows.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_155_show_big_thumbnails.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_156_show_thumbnails.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_157_show_thumbnails_with_lines.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_158_show_lines.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_159_playlist.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_160_imac.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_161_macbook.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_162_ipad.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_163_iphone.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_164_iphone_transfer.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_165_iphone_exchange.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_166_ipod.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_167_ipod_shuffle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_168_ear_plugs.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_169_phone.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_170_step_backward.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_171_fast_backward.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_172_rewind.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_173_play.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_174_pause.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_175_stop.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_176_forward.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_177_fast_forward.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_178_step_forward.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_179_eject.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_180_facetime_video.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_181_download_alt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_182_mute.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_183_volume_down.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_184_volume_up.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_185_screenshot.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_186_move.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_187_more.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_188_brightness_reduce.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_189_brightness_increase.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_190_circle_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_191_circle_minus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_192_circle_remove.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_193_circle_ok.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_194_circle_question_mark.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_195_circle_info.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_196_circle_exclamation_mark.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_197_remove.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_199_ban.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_200_download.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_201_upload.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_202_shopping_cart.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_203_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_204_unlock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_205_electricity.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_206_ok_2.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_207_remove_2.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_208_cart_out.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_209_cart_in.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_210_left_arrow.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_211_right_arrow.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_212_down_arrow.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_213_up_arrow.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_214_resize_small.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_215_resize_full.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_216_circle_arrow_left.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_217_circle_arrow_right.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_218_circle_arrow_top.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_219_circle_arrow_down.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_220_play_button.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_221_unshare.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_222_share.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_223_chevron-right.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_224_chevron-left.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_225_bluetooth.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_226_euro.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_227_usd.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_228_gbp.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_229_retweet_2.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_230_moon.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_231_sun.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_232_cloud.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_233_direction.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_234_brush.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_235_pen.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_236_zoom_in.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_237_zoom_out.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_238_pin.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_239_albums.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_240_rotation_lock.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_241_flash.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_242_google_maps.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_243_anchor.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_244_conversation.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_245_chat.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_246_male.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_247_female.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_248_asterisk.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_249_divide.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_250_snorkel_diving.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_251_scuba_diving.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_252_oxygen_bottle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_253_fins.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_254_fishes.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_255_boat.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_256_delete.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_257_sheriffs_star.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_258_qrcode.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_259_barcode.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_260_pool.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_261_buoy.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_262_spade.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_263_bank.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_264_vcard.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_265_electrical_plug.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_266_flag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_267_credit_card.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_268_keyboard_wireless.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_269_keyboard_wired.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_270_shield.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_271_ring.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_272_cake.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_273_drink.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_274_beer.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_275_fast_food.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_276_cutlery.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_277_pizza.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_278_birthday_cake.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_279_tablet.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_280_settings.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_281_bullets.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_282_cardio.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_283_t-shirt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_284_pants.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_285_sweater.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_286_fabric.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_287_leather.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_288_scissors.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_289_bomb.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_290_skull.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_291_celebration.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_292_tea_kettle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_293_french_press.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_294_coffe_cup.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_295_pot.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_296_grater.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_297_kettle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_298_hospital.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_299_hospital_h.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_300_microphone.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_301_webcam.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_302_temple_christianity_church.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_303_temple_islam.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_304_temple_hindu.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_305_temple_buddhist.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_306_bicycle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_307_life_preserver.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_308_share_alt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_309_comments.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_310_flower.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_311_baseball.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_312_rugby.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_313_ax.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_314_table_tennis.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_315_bowling.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_316_tree_conifer.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_317_tree_deciduous.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_318_more_items.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_319_sort.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_320_filter.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_321_gamepad.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_322_playing_dices.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_323_calculator.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_324_tie.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_325_wallet.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_326_piano.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_327_sampler.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_328_podium.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_329_soccer_ball.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_330_blog.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_331_dashboard.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_332_certificate.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_333_bell.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_334_candle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_335_pushpin.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_336_iphone_shake.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_337_pin_flag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_338_turtle.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_339_rabbit.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_341_briefcase.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_342_hdd.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_343_thumbs_up.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_344_thumbs_down.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_345_hand_right.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_346_hand_left.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_347_hand_up.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_348_hand_down.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_349_fullscreen.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_350_shopping_bag.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_351_book_open.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_352_nameplate.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_353_nameplate_alt.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_354_vases.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_355_bullhorn.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_356_dumbbell.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_357_suitcase.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_358_file_import.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_359_file_export.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_360_bug.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_361_crown.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_362_smoking.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_363_cloud_upload.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_364_cloud_download.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_365_restart.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_366_security_camera.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_367_expand.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_368_collapse.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_369_collapse_top.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_372_spray.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_373_nails.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_374_claw_hammer.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_375_classic_hammer.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_376_hand_saw.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_377_riflescope.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_378_electrical_socket_eu.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_379_electrical_socket_us.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_380_pinterest.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_381_dropbox.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_382_google_plus.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_383_jolicloud.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_384_yahoo.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_385_blogger.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_386_picasa.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_387_amazon.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_388_tumblr.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_389_wordpress.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_390_instapaper.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_391_evernote.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_392_xing.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_393_zootool.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_394_dribbble.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_395_deviantart.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_396_read_it_later.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_397_linked_in.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_398_forrst.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_399_pinboard.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_400_behance.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_401_github.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_402_youtube.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_403_skitch.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_404_4square.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_405_quora.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_406_badoo.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_407_spotify.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_408_stumbleupon.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_409_readability.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_410_facebook.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_411_twitter.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_412_instagram.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_413_posterous_spaces.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_414_vimeo.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_415_flickr.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_416_last_fm.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_417_rss.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_418_skype.png" />
+    <Resource Include="Images\ButtonsDark\glyphicons_419_e-mail.png" />
+    <Resource Include="Images\ButtonsDark\quote.png" />
+    <Resource Include="Images\ButtonsDark\resize.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

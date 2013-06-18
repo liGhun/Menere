@@ -17,6 +17,12 @@ namespace Menere.Model
             fever_account = new SharpFever.Model.Account();
             feeds = new ObservableCollection<IFeed>();
             items = new ObservableCollection<IItem>();
+            groups = new ObservableCollection<IFolder>();
+        }
+
+        public override string ToString()
+        {
+            return this.name;
         }
 
 
@@ -24,6 +30,12 @@ namespace Menere.Model
         public string url { get; set; }
         public SharpFever.Model.Account fever_account;
         public ObservableCollection<SharpFever.Model.FavIcon> favicons { get; set; }
+
+        public bool initial_fetch_completed
+        {
+            get;
+            set;
+        }
 
         public bool check_credentials()
         {
@@ -37,15 +49,20 @@ namespace Menere.Model
             }
             if (response.auth)
             {
+                FeverResponse available_favicons = fever_account.get_favicons();
+                foreach (SharpFever.Model.FavIcon favicon in available_favicons.favicons)
+                {
+                    favicons.Add(favicon);
+                }
                 FeverResponse available_feeds = fever_account.get_feeds();
                 foreach (SharpFever.Model.Feed feed in available_feeds.feeds)
                 {
                     feeds.Add(new FeverFeed(feed, this));
                 }
-                FeverResponse available_favicons = fever_account.get_favicons();
-                foreach (SharpFever.Model.FavIcon favicon in available_favicons.favicons)
+                FeverResponse available_groups = fever_account.get_groups();
+                foreach (SharpFever.Model.FeedsGroup group in available_groups.feeds_groups)
                 {
-                    favicons.Add(favicon);
+                    groups.Add(new FeverFolder(group, feeds, available_groups.groups));
                 }
             }
             return response.auth;
@@ -53,8 +70,11 @@ namespace Menere.Model
 
         public string name
         {
-            get;
-            set;
+            get
+            {
+                return string.Format("Fever {0}", this.email);
+            }
+            set { }
         }
 
         public ObservableCollection<IFeed> feeds
@@ -93,31 +113,42 @@ namespace Menere.Model
             SharpFever.Model.FeverResponse unread_items_ids = fever_account.get_unread_item_ids();
             if (unread_items_ids != null)
             {
-                if (unread_items_ids.unread_item_ids_list != null && !string.IsNullOrEmpty(unread_items_ids.unread_item_ids))
+                if (unread_items_ids.unread_item_ids_list.Count > 0)
                 {
-                    SharpFever.Model.FeverResponse unread_fever_items = fever_account.get_items(with_ids: unread_items_ids.unread_item_ids_list);
-                    foreach (SharpFever.Model.Item fever_item in unread_fever_items.items)
+                    while (unread_items_ids.unread_item_ids_list.Count > 0)
                     {
-                        IItem existing_item = null;
-                        try
+                        List<uint> ids = unread_items_ids.unread_item_ids_list.GetRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
+                        unread_items_ids.unread_item_ids_list.RemoveRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
+                        SharpFever.Model.FeverResponse unread_fever_items = fever_account.get_items(with_ids: ids);
+                        foreach (SharpFever.Model.Item fever_item in unread_fever_items.items)
                         {
-                            existing_item = items.Where(item => item.id == fever_item.id.ToString()).First();
-                        }
-                        catch { }
-                        if (existing_item == null)
-                        {
-                            Model.FeverItem item = new Model.FeverItem(fever_item, this);
-                            item.receiving_account = this;
-                            items.Add(item);
-                            if (first_fetch_completed)
+                            IItem existing_item = null;
+                            try
                             {
-                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: item.feed.title, text: item.title,iconBase64:item.feed.icon_base64);
+                                existing_item = items.Where(item => item.id == fever_item.id.ToString()).First();
+                            }
+                            catch { }
+                            if (existing_item == null)
+                            {
+                                Model.FeverItem item = new Model.FeverItem(fever_item, this);
+                                item.receiving_account = this;
+                                items.Add(item);
+                                if (first_fetch_completed)
+                                {
+                                    AppController.Current.snarl_interface.Notify(classId: "New unread item", title: item.feed.title, text: item.title, iconBase64: item.feed.icon_base64);
+                                }
                             }
                         }
                     }
                 }
+                else
+                {
+                    items.Clear();
+                }
             }
             first_fetch_completed = true;
+            initial_fetch_completed = true;
+            AppController.Current.update_filter();
             return true;
         }
 
@@ -207,6 +238,19 @@ namespace Menere.Model
             public string email { get; set; }
             public string api_key { get; set; }
             public string url { get; set; }
+        }
+
+
+        public ObservableCollection<IFolder> groups
+        {
+            get;
+            set;
+        }
+
+
+        public string folder_name
+        {
+            get { return "Groups"; }
         }
     }
 }

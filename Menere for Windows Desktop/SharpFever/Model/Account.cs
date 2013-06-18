@@ -161,7 +161,7 @@ namespace SharpFever.Model
         }
 
         public bool mark_item_as_read(uint id) {
-            Dictionary<string, string> parameters = new Dictionary<string,string>();
+             Dictionary<string, string> parameters = new Dictionary<string,string>();
             parameters.Add("mark","item");
             parameters.Add("as","read");
             parameters.Add("id", id.ToString());

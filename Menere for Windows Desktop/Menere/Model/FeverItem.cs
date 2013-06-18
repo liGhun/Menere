@@ -116,7 +116,11 @@ namespace Menere.Model
         {
             get
             {
-                return DateTime.Now;
+                long ticks = Convert.ToInt64(fever_item.created_on_time);
+                System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                dtDateTime = dtDateTime.AddSeconds(ticks).ToLocalTime();
+
+                return dtDateTime;
             }
             set
             {
@@ -126,7 +130,12 @@ namespace Menere.Model
 
         public bool mark_read()
         {
-            return AppController.Current.main_window.account.fever_account.mark_item_as_read(this.fever_item);
+            FeverAccount rev_account = this.receiving_account as FeverAccount;
+            if (rev_account != null)
+            {
+                return rev_account.fever_account.mark_item_as_read(this.fever_item);
+            }
+            return false;
         }
 
         public bool mark_unread()

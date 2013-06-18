@@ -31,6 +31,7 @@ namespace SharpFever.Model
             set
             {
                 _unread_item_ids = value;
+                unread_item_ids_list = new List<uint>();
                 if (value != null)
                 {
                     string[] values = value.Split(',');

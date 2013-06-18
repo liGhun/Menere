@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\
 Menere
 none
 false
 DEBUG;TRACE
-D:\Users\WaltherS\Documents\Development\Menere\Menere\App.xaml
+C:\Users\WaltherS\Documents\Development\Menere\Menere\App.xaml
 32102537435
 124-202193415
 81152148628
-16614372826
+16264065647
 Controls\FeedBox.xaml;Controls\ItemBox.xaml;MainWindow.xaml;
 
-False
+True
 

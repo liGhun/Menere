@@ -1,3 +1,14 @@
+0.5
+Feedly add
+Many design improvements
+
+0.4
+Added folder/groups filtering
+Updated items display with icon, feedname and date
+Added feed icon to feeds list
+Now fetching all unread items (has been limited to 50 in 0.3.2)
+Tested with Stringer
+
 0.3.2
 Changed account saving code (not on decontrutor but on account changes)
 

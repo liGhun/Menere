@@ -22,11 +22,22 @@ namespace Menere
         public static ObservableCollection<IAccount> accounts { get; set; }
         public Snarl.SnarlInterface snarl_interface;
 
-        private AppController()
+        public Model.IAccount current_account
         {
+            get;
+            set;
+        }
+
+        private AppController()
+        {           
             Current = this;
             app_data_path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\liGhun\\Menere\\";
             themes_path = app_data_path + "Themes\\";
+
+
+
+            System.Windows.FrameworkElement.LanguageProperty.OverrideMetadata(typeof(System.Windows.FrameworkElement),
+                new System.Windows.FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
 
             available_account_types = new ObservableCollection<IAccount>();
             available_account_types.Add(new Model.FeverAccount());
@@ -45,6 +56,10 @@ namespace Menere
             if (!System.IO.Directory.Exists(themes_path))
             {
                 System.IO.Directory.CreateDirectory(themes_path);
+            }
+            if (!System.IO.Directory.Exists(app_data_path + "\\icons"))
+            {
+                System.IO.Directory.CreateDirectory(app_data_path + "\\icons");
             }
             app_program_path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
 
@@ -71,6 +86,7 @@ namespace Menere
 
             toggle_proxy();
 
+            //Properties.Settings.Default.accounts = null;
             if (Properties.Settings.Default.accounts != null)
             {
                 if (Properties.Settings.Default.accounts.Count > 0)
@@ -83,11 +99,22 @@ namespace Menere
                             switch (account_data[0])
                             {
                                 case "Fever":
-                                    FeverAccount account = new FeverAccount();
-                                    account.load_settings(Helper.Crypto.ToInsecureString(Helper.Crypto.DecryptString(account_data[1])));
-                                    if (account.check_credentials())
+                                    FeverAccount fever_account = new FeverAccount();
+                                    fever_account.load_settings(Helper.Crypto.ToInsecureString(Helper.Crypto.DecryptString(account_data[1])));
+                                    if (fever_account.check_credentials())
                                     {
-                                        accounts.Add(account);
+                                        accounts.Add(fever_account);
+                                    }
+                                    
+                                    break;
+
+                                case "Feedly":
+                                    FeedlyAccount feedly_account = new FeedlyAccount();
+                                    feedly_account.load_settings(Helper.Crypto.ToInsecureString(Helper.Crypto.DecryptString(account_data[1])));
+                                    if (feedly_account.check_credentials())
+                                    {
+                                        accounts.Add(feedly_account);
+                                        
                                     }
                                     break;
 
@@ -110,6 +137,7 @@ namespace Menere
 
         }
 
+
         ~AppController()
         {
             snarl_interface.Unregister();
@@ -131,9 +159,12 @@ namespace Menere
         {
             if (main_window == null)
             {
+                this.current_account = accounts[0];
                 main_window = new MainWindow();
                 main_window.Closing += main_window_Closing;
             }
+            main_window.combobox_accounts.ItemsSource = accounts;
+            main_window.combobox_accounts.SelectedItem = accounts.Last();
             if (!main_window_opened && accounts.Count > 0)
             {
                 main_window.Show();
@@ -141,6 +172,10 @@ namespace Menere
             if (all_accounts_read)
             {
                 save_accounts();
+            }
+            if (accounts.Count > 1)
+            {
+                main_window.combobox_accounts.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -174,6 +209,11 @@ namespace Menere
                 System.Net.WebRequest.DefaultWebProxy = null;
             }
 
+        }
+
+        public void update_filter()
+        {
+            main_window.update_all_filter();
         }
     }
 }

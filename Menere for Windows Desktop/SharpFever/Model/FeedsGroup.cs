@@ -9,7 +9,7 @@ namespace SharpFever.Model
     public class FeedsGroup
     {
         public ulong group_id { get; set; }
-        public string feeds_ids
+        public string feed_ids
         {
             get
             {

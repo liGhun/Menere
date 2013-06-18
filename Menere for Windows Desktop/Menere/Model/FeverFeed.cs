@@ -29,6 +29,34 @@ namespace Menere.Model
             items = new ObservableCollection<IItem>();
             fever_feed = feed;
             receiving_account = account;
+            
+            if(!string.IsNullOrEmpty(icon_base64)) {
+                try
+                {
+                    icon_path = AppController.app_data_path + "\\icons\\fever_" + this.id + ".ico";
+                    byte[] bytes = System.Convert.FromBase64String(icon_base64);
+                    System.IO.File.WriteAllBytes(icon_path, bytes);
+                }
+                catch { }
+            }
+            if (string.IsNullOrEmpty(icon_path))
+            {
+                icon_path = "/Menere;component/Images/MenereIcon.ico";
+            }
+        }
+
+        ~FeverFeed() {
+            if (!string.IsNullOrEmpty(icon_path))
+            {
+                if (System.IO.File.Exists(icon_path))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(icon_path);
+                    }
+                    catch { }
+                }
+            }
         }
 
         public override string ToString()
@@ -118,13 +146,27 @@ namespace Menere.Model
             get
             {
                 FeverAccount fever_account = this.receiving_account as FeverAccount;
-                SharpFever.Model.FavIcon favicon = fever_account.favicons.Where(fav => fav.id == fever_feed.favicon_id).First();
-                return favicon.base64;
+                try
+                {
+                    SharpFever.Model.FavIcon favicon = fever_account.favicons.Where(fav => fav.id == fever_feed.favicon_id).First();
+                    return favicon.base64;
+                }
+                catch
+                {
+                    return null;
+                }
             }
             set
             {
                 // never ever
             }
+        }
+
+
+        public string icon_path
+        {
+            get;
+            set;
         }
     }
 }

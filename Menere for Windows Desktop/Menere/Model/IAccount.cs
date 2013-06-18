@@ -12,8 +12,12 @@ namespace Menere.Model
         string type { get;}
         string icon_path { get;}
         string name { get; set; }
+        bool initial_fetch_completed { get; set; }
         ObservableCollection<IFeed> feeds { get; set; }
         ObservableCollection<IItem> items { get; set; }
+        ObservableCollection<IFolder> groups { get; set; }
+
+        string folder_name { get;}
         
         void load_settings(string settings);
         string get_settings();

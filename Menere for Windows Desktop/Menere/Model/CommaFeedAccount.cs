@@ -13,6 +13,12 @@ namespace Menere.Model
             get { return "Comma Feed"; }
         }
 
+        public bool initial_fetch_completed
+        {
+            get;
+            set;
+        }
+
         public string icon_path
         {
             get { return "/Menere;component/Images/AccountTypes/commaFeed.png"; }
@@ -78,6 +84,32 @@ namespace Menere.Model
         {
             UserInterface.AccountSpecific.AccountTypeNotAvailable not_available = new UserInterface.AccountSpecific.AccountTypeNotAvailable();
             not_available.Show();
+        }
+
+
+        public System.Collections.ObjectModel.ObservableCollection<IFolder> groups
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        public string folder_name
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

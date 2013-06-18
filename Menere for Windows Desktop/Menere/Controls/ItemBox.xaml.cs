@@ -31,7 +31,7 @@ namespace Menere.Controls
              Button button = sender as Button;
              if (button != null)
              {
-                 FeverItem item = button.DataContext as FeverItem;
+                 IItem item = button.DataContext as IItem;
                  if (item != null)
                  {
                      if (item.mark_read())
@@ -47,7 +47,7 @@ namespace Menere.Controls
             Button button = sender as Button;
             if (button != null)
             {
-                FeverItem item = button.DataContext as FeverItem;
+                IItem item = button.DataContext as IItem;
                 if (item != null)
                 {
                     System.Diagnostics.Process.Start(item.url);
@@ -61,7 +61,7 @@ namespace Menere.Controls
             {
                 if (e.ClickCount == 2)
                 {
-                    FeverItem item = this.DataContext as FeverItem;
+                    IItem item = this.DataContext as IItem;
                     if (item != null)
                     {
                         AppController.Current.main_window.webbrowser.Navigate(item.url);
@@ -69,5 +69,31 @@ namespace Menere.Controls
                 }
             }
         }
+
+        private void image_faviconItem_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            try
+            {
+                IItem item = this.DataContext as IItem;
+                if (item != null)
+                {
+
+                    BitmapImage image = new BitmapImage(new Uri(string.Format("https://plus.google.com/_/favicon?domain={0}&alt=feed", System.Web.HttpUtility.UrlEncode(item.feed.site_url)), UriKind.Relative));
+                    image_faviconItem.Source = image;
+                }
+                else
+                {
+                    BitmapImage image = new BitmapImage(new Uri("/Menere;component/Images/MenereIcon.ico", UriKind.Relative));
+                    image_faviconItem.Source = image;
+                }
+            }
+            catch
+            {
+                BitmapImage image = new BitmapImage(new Uri("/Menere;component/Images/MenereIcon.ico", UriKind.Relative));
+                image_faviconItem.Source = image;
+            }
+        }
+
+  
     }
 }

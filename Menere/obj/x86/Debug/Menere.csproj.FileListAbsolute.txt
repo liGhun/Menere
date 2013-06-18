@@ -335,3 +335,14 @@ D:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere_Marku
 C:\Users\WaltherS\Documents\Development\Menere\Menere\bin\Debug\Menere.exe.config
 C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere.exe
 C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere.pdb
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere.csprojResolveAssemblyReference.cache
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\FeedBox.baml
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\ItemBox.baml
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\FeedBox.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Controls\ItemBox.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\MainWindow.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\App.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere_Content.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\GeneratedInternalTypeHelper.g.cs
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere_MarkupCompile.cache
+C:\Users\WaltherS\Documents\Development\Menere\Menere\obj\x86\Debug\Menere_MarkupCompile.lref

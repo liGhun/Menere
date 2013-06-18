@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="Menere.Controls.FeedBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <VirtualizingStackPanel Orientation="Horizontal">
+            <Image Name="image_favicon" Source="{Binding Path=icon_path}"  Margin="0,0,5,0" Height="12" ImageFailed="image_favicon_ImageFailed" />
+            <TextBlock Name="textblock_title" Text="{Binding Path=title}"
+                       Background="Transparent" 
+                       Foreground="{DynamicResource ResourceKey=color_main_foreground}"
+                       ToolTip="{Binding Path=title}" />
+        </VirtualizingStackPanel>
+    </Grid>
+</UserControl>

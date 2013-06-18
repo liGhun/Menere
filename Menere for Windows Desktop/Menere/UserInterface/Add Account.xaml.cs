@@ -24,6 +24,15 @@ namespace Menere.UserInterface
             InitializeComponent();
 
             listbox_accounts.ItemsSource = AppController.available_account_types;
+            AppController.accounts.CollectionChanged += accounts_CollectionChanged;
+        }
+
+        void accounts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (AppController.accounts.Count >= 1)
+            {
+                this.Close();
+            }
         }
     }
 }

@@ -10,3 +10,8 @@ D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\GenerateRes
 D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\GenerateResource.write.1.tlog
 D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.dll
 D:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.pdb
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.csprojResolveAssemblyReference.cache
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.Resources.resources
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.csproj.GenerateResource.Cache
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.dll
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.pdb
