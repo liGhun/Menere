@@ -13,6 +13,7 @@
     <SolidColorBrush Color="#657b83" x:Key="color_main_foreground"/>
     <SolidColorBrush Color="#fdf6e3" x:Key="color_content_background"/>
     <SolidColorBrush Color="#6c71c4" x:Key="color_feed_name_header"/>
+    <SolidColorBrush Color="#b58900" x:Key="color_active_items_list"/>
     <SolidColorBrush Color="DarkGray" x:Key="color_border_around_item" />
 
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#eee8d5" />

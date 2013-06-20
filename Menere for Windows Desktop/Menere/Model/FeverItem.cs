@@ -13,6 +13,7 @@ namespace Menere.Model
         public FeverItem(SharpFever.Model.Item item, IAccount account)
         {
             fever_item = item;
+            this.receiving_account = account;
         }
 
         public string id
@@ -112,6 +113,18 @@ namespace Menere.Model
             }
         }
 
+        public bool is_saved
+        {
+            get
+            {
+                return fever_item.is_saved;
+            }
+            set
+            {
+                fever_item.is_saved = value;
+            }
+        }
+
         public DateTime created
         {
             get
@@ -140,7 +153,7 @@ namespace Menere.Model
 
         public bool mark_unread()
         {
-            throw new NotImplementedException();
+            return false;
         }
 
 

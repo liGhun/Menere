@@ -33,15 +33,23 @@ namespace Menere.Model
             if(!string.IsNullOrEmpty(icon_base64)) {
                 try
                 {
-                    icon_path = AppController.app_data_path + "\\icons\\fever_" + this.id + ".ico";
+                    
                     byte[] bytes = System.Convert.FromBase64String(icon_base64);
-                    System.IO.File.WriteAllBytes(icon_path, bytes);
+                    if (bytes.Length > 32)
+                    {
+                        icon_path = AppController.app_data_path + "\\icons\\fever_" + this.id + ".ico";
+                        System.IO.File.WriteAllBytes(icon_path, bytes);
+                    }
+                    else
+                    {
+                        icon_path = string.Format("https://plus.google.com/_/favicon?domain={0}&alt=feed", System.Web.HttpUtility.UrlEncode(fever_feed.site_url));
+                    }
                 }
                 catch { }
             }
             if (string.IsNullOrEmpty(icon_path))
             {
-                icon_path = "/Menere;component/Images/MenereIcon.ico";
+                icon_path = string.Format("https://plus.google.com/_/favicon?domain={0}&alt=feed", System.Web.HttpUtility.UrlEncode(fever_feed.site_url));
             }
         }
 

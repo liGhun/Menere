@@ -1,6 +1,15 @@
+0.6
+Access to read items and saved items added
+Fever now also fetches read items
+Fever refesh now a background thread 
+Item display now with a tooltip to show the keyboard shortcuts
+Feed item retrieval in Fever now also uses an alternative favicon if the one provided by the API is only 1px in size (like SPIEGEL ONLINE)
+What shall I say - so many, many changes I cannot remember all of them...
+
 0.5
-Feedly add
+Feedly added
 Many design improvements
+Multi account added (dropdown on top right to change account)
 
 0.4
 Added folder/groups filtering

@@ -60,6 +60,9 @@ namespace Menere.Model
             }
         }
 
+        public System.Collections.ObjectModel.ObservableCollection<IItem> unread_items { get; set; }
+        public System.Collections.ObjectModel.ObservableCollection<IItem> saved_items { get; set; }
+
         public void load_settings(string settings)
         {
             throw new NotImplementedException();

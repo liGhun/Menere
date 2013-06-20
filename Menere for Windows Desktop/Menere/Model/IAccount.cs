@@ -15,6 +15,8 @@ namespace Menere.Model
         bool initial_fetch_completed { get; set; }
         ObservableCollection<IFeed> feeds { get; set; }
         ObservableCollection<IItem> items { get; set; }
+        ObservableCollection<IItem> unread_items { get; set; }
+        ObservableCollection<IItem> saved_items { get; set; }
         ObservableCollection<IFolder> groups { get; set; }
 
         string folder_name { get;}

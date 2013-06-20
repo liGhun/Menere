@@ -33,10 +33,13 @@ namespace Menere.UserInterface
         public Model.IFeed current_filter_feed { get; set; }
         public Model.IFolder current_filter_folder { get; set; }
         private int last_selected_index { get; set; }
+        public ObservableCollection<IItem> current_shown_items { get; set; }
         
         public MainWindow()
         {
             InitializeComponent();
+
+            button_show_saved.Visibility = System.Windows.Visibility.Collapsed;
 
             combobox_accounts.Visibility = System.Windows.Visibility.Collapsed;
             button_remove_feed_filter.Visibility = System.Windows.Visibility.Collapsed;
@@ -46,11 +49,13 @@ namespace Menere.UserInterface
             listbox_feeds.ItemsSource = account.feeds;
             listbox_groups.ItemsSource = account.groups;
             listbox_items.Items.SortDescriptions.Add(new SortDescription("created", ListSortDirection.Ascending));
+            listbox_feeds.Items.SortDescriptions.Add(new SortDescription("title", ListSortDirection.Ascending));
+            listbox_groups.Items.SortDescriptions.Add(new SortDescription("name", ListSortDirection.Ascending));
             listbox_items.ItemsSource = account.items;
-            account.items.CollectionChanged += unread_items_CollectionChanged;
+            current_shown_items = account.items;
+            current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             webbrowser.Navigated += webbrowser_Navigated;
             textblock_item_title.Text = "";
-            Button_Click(null, null);
 
            // filter_feeds();
 
@@ -68,25 +73,22 @@ namespace Menere.UserInterface
         void unread_items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             update_header_items();
+            
             if (AppController.Current.current_account.initial_fetch_completed)
             {
                 filter_feeds();
                 filter_items();
-                
             }
         }
         private void update_header_items()
         {
-            textblock_header_unread_items.Text = string.Format("Unread items ({0})", listbox_items.Items.Count);
+            button_show_unread.Content = string.Format("Unread items ({0})", account.unread_items.Count());
+            button_show_all.Content = string.Format("All items ({0})", account.items.Count());
+            button_show_saved.Content = string.Format("Saved items ({0})", account.saved_items.Count());
         }
         
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            
-            button_refresh_Click(null, null);
 
-        }
 
         private void listbox_items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -145,7 +147,7 @@ namespace Menere.UserInterface
             true);
         }
 
-        private void button_refresh_Click(object sender, RoutedEventArgs e)
+        public  void button_refresh_Click(object sender, RoutedEventArgs e)
         {
             foreach (IAccount account_available in AppController.accounts)
             {
@@ -194,9 +196,21 @@ namespace Menere.UserInterface
                     Model.IItem item = listbox_items.SelectedItem as Model.IItem;
                     if (item != null)
                     {
-                        if (item.mark_read())
+                        if (!item.is_read)
                         {
-                            item.receiving_account.items.Remove(item);
+                            if (item.mark_read())
+                            {
+                                item.receiving_account.unread_items.Remove(item);
+                                item.is_read = true;
+                            }
+                        }
+                        else
+                        {
+                            if (item.mark_read())
+                            {
+                                item.receiving_account.unread_items.Add(item);
+                                item.is_read = false;
+                            }
                         }
                     }
                 }
@@ -224,6 +238,7 @@ namespace Menere.UserInterface
                     {
                         System.Diagnostics.Process.Start(item.url);
                     }
+                    e.Handled = true;
                 }
             }
         }
@@ -285,7 +300,7 @@ namespace Menere.UserInterface
                    }
                    try
                    {
-                       IEnumerable<Model.IItem> items_in_this_feed = account.items.Where(item => item.feed_id == feed.id);
+                       IEnumerable<Model.IItem> items_in_this_feed = current_shown_items.Where(item => item.feed_id == feed.id);
                        if (items_in_this_feed == null)
                        {
                            return false;
@@ -400,12 +415,83 @@ namespace Menere.UserInterface
             {
                 AppController.Current.current_account = chosen_account;
                 account = chosen_account;
+                if (account.GetType() == typeof(FeverAccount) || account.GetType() == typeof(FeedlyAccount))
+                {
+                    button_show_saved.Visibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    button_show_saved.Visibility = System.Windows.Visibility.Collapsed;
+                }
                 this.textblock_foldername.Text = account.folder_name;
-                listbox_items.ItemsSource = account.items;
                 listbox_feeds.ItemsSource = account.feeds;
                 listbox_groups.ItemsSource = account.groups;
+                button_show_all_Click(null, null);
                 update_header_items();
             }
+        }
+
+        public void button_show_unread_Click(object sender, RoutedEventArgs e)
+        {
+            grid_main.Focus();
+            button_show_unread.Background = System.Windows.Application.Current.Resources["color_active_items_list"] as SolidColorBrush;
+            button_show_unread.IsEnabled = false;
+
+            button_show_all.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_all.IsEnabled = true;
+
+            button_show_saved.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_saved.IsEnabled = true;
+
+            current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
+            listbox_items.ItemsSource = account.unread_items;
+            current_shown_items = account.unread_items;
+            current_shown_items.CollectionChanged += unread_items_CollectionChanged;
+            unread_items_CollectionChanged(null, null);
+            filter_feeds();
+            listbox_items.UpdateLayout();
+        }
+
+        public void button_show_saved_Click(object sender, RoutedEventArgs e)
+        {
+            grid_main.Focus();
+            button_show_unread.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_unread.IsEnabled = true;
+
+            button_show_all.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_all.IsEnabled = true;
+
+            button_show_saved.Background = System.Windows.Application.Current.Resources["color_active_items_list"] as SolidColorBrush;
+            button_show_saved.IsEnabled = false;
+
+            current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
+            listbox_items.ItemsSource = account.saved_items;
+            current_shown_items = account.saved_items;
+            current_shown_items.CollectionChanged += unread_items_CollectionChanged;
+            unread_items_CollectionChanged(null, null);
+            filter_feeds();
+            listbox_items.UpdateLayout();
+        }
+
+        public void button_show_all_Click(object sender, RoutedEventArgs e)
+        {
+            grid_main.Focus();
+            button_show_unread.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_unread.IsEnabled = true;
+
+            button_show_all.Background = System.Windows.Application.Current.Resources["color_active_items_list"] as SolidColorBrush;
+            button_show_all.IsEnabled = false;
+
+            button_show_saved.Background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            button_show_saved.IsEnabled = true;
+
+            current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
+            listbox_items.ItemsSource = account.items;
+            current_shown_items = account.items;
+            current_shown_items.CollectionChanged += unread_items_CollectionChanged;
+            unread_items_CollectionChanged(null, null);
+            filter_feeds();
+            listbox_items.UpdateLayout();
         }
 
         

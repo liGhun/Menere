@@ -11,7 +11,7 @@
             <Grid.Resources>
                 <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
             </Grid.Resources>
-            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical">
+            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" ToolTip="Mark as read: space&#x0a;Next item: arrow down or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow">
                 <VirtualizingStackPanel Name="stackpanel_item_header" Orientation="Horizontal">
                     <Image Source="{Binding Path=feed.icon_path}"  Name="image_faviconItem" MinWidth="24" Height="24" MaxHeight="32" MaxWidth="32" Margin="0,2,9,2" ImageFailed="image_faviconItem_ImageFailed">
                         <Image.Effect>

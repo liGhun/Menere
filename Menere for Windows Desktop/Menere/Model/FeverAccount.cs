@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Security.Cryptography;
 using SharpFever;
 using SharpFever.Model;
+using System.ComponentModel;
 
 namespace Menere.Model
 {
@@ -18,6 +19,15 @@ namespace Menere.Model
             feeds = new ObservableCollection<IFeed>();
             items = new ObservableCollection<IItem>();
             groups = new ObservableCollection<IFolder>();
+            unread_items = new ObservableCollection<IItem>();
+            saved_items = new ObservableCollection<IItem>();
+
+            backgroundWorker_update_entries = new BackgroundWorker();
+            backgroundWorker_update_entries.WorkerReportsProgress = true;
+            backgroundWorker_update_entries.WorkerSupportsCancellation = true;
+            backgroundWorker_update_entries.DoWork += backgroundWorker_update_entries_DoWork;
+            backgroundWorker_update_entries.RunWorkerCompleted += backgroundWorker_update_entries_RunWorkerCompleted;
+            backgroundWorker_update_entries.ProgressChanged += backgroundWorker_update_entries_ProgressChanged;
         }
 
         public override string ToString()
@@ -110,6 +120,11 @@ namespace Menere.Model
 
         public bool update_all_feeds()
         {
+            if (!backgroundWorker_update_entries.IsBusy)
+            {
+                backgroundWorker_update_entries.RunWorkerAsync();
+            }
+            /*
             SharpFever.Model.FeverResponse unread_items_ids = fever_account.get_unread_item_ids();
             if (unread_items_ids != null)
             {
@@ -125,14 +140,14 @@ namespace Menere.Model
                             IItem existing_item = null;
                             try
                             {
-                                existing_item = items.Where(item => item.id == fever_item.id.ToString()).First();
+                                existing_item = unread_items.Where(item => item.id == fever_item.id.ToString()).First();
                             }
                             catch { }
                             if (existing_item == null)
                             {
                                 Model.FeverItem item = new Model.FeverItem(fever_item, this);
                                 item.receiving_account = this;
-                                items.Add(item);
+                                unread_items.Add(item);
                                 if (first_fetch_completed)
                                 {
                                     AppController.Current.snarl_interface.Notify(classId: "New unread item", title: item.feed.title, text: item.title, iconBase64: item.feed.icon_base64);
@@ -149,6 +164,7 @@ namespace Menere.Model
             first_fetch_completed = true;
             initial_fetch_completed = true;
             AppController.Current.update_filter();
+             * */
             return true;
         }
 
@@ -233,6 +249,9 @@ namespace Menere.Model
             set;
         }
 
+        public System.Collections.ObjectModel.ObservableCollection<IItem> unread_items { get; set; }
+        public System.Collections.ObjectModel.ObservableCollection<IItem> saved_items { get; set; }
+
         public class FeverSettings
         {
             public string email { get; set; }
@@ -252,5 +271,113 @@ namespace Menere.Model
         {
             get { return "Groups"; }
         }
+
+        public uint max_id_fetched { get; set; }
+
+        void backgroundWorker_update_entries_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e != null)
+            {
+                switch (e.ProgressPercentage)
+                {
+                    case 90:
+                        FeverItem item = e.UserState as FeverItem;
+                        if (item != null)
+                        {
+                            items.Add(item);
+
+                        }
+                        break;
+
+                    case 91:
+                        FeverItem unread_item = e.UserState as FeverItem;
+                        if (unread_item != null)
+                        {
+                            unread_items.Add(unread_item);
+                            if (initial_fetch_completed)
+                            {
+                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title,  icon:unread_item.feed.icon_path);
+                            }
+                        }
+                        break;
+
+                    case 92:
+                        FeverItem saved_item = e.UserState as FeverItem;
+                        if (saved_item != null)
+                        {
+                            saved_items.Add(saved_item);
+                        }
+                        break;
+
+                    case 100:
+                        uint? updated = e.UserState as uint?;
+                        if(updated != null) {
+                            max_id_fetched = updated.Value;
+                        }
+                        break;
+                }
+            }
+        }
+
+        void backgroundWorker_update_entries_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (!initial_fetch_completed)
+            {
+                first_fetch_completed = true;
+                initial_fetch_completed = true;
+                AppController.Current.update_filter();
+            }
+        }
+
+        void backgroundWorker_update_entries_DoWork(object sender, DoWorkEventArgs e)
+        {
+            uint max_id = this.max_id_fetched;
+            FeverResponse entries = new FeverResponse();
+            entries.items = new ObservableCollection<Item>();
+              do {
+                  entries = fever_account.get_items(since_id:Convert.ToInt32(max_id));
+                  if(entries == null) {return;}
+                    foreach (SharpFever.Model.Item entry in entries.items)
+                    {
+                        IEnumerable<IItem> existing_item = items.Where(i => i.id == entry.id.ToString());
+                        try
+                        {
+                            if (existing_item != null)
+                            {
+                                if (existing_item.Count() > 0)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+                        catch { }
+
+
+                        FeverItem item = new FeverItem(entry,this);
+                        item.receiving_account = this;
+                        backgroundWorker_update_entries.ReportProgress(90, item);
+
+
+                        backgroundWorker_update_entries.ReportProgress(90, item);
+                        if (!item.is_read)
+                        {
+                            backgroundWorker_update_entries.ReportProgress(91, item);
+                        }
+                        if (item.is_saved)
+                        {
+                            backgroundWorker_update_entries.ReportProgress(92, item);
+                        }
+                        if(entry.id > max_id) {
+                            max_id = entry.id;
+                            uint? report_value = entry.id;
+                            backgroundWorker_update_entries.ReportProgress(100, report_value);
+                        }
+
+                    }
+              } while (entries.items.Count > 0);
+
+        }
+
+        private BackgroundWorker backgroundWorker_update_entries;
     }
 }

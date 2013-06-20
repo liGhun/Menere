@@ -136,6 +136,12 @@ namespace Menere.Model
             }
         }
 
+        public bool is_saved
+        {
+            get;
+            set;
+        }
+
         public DateTime created
         {
             get

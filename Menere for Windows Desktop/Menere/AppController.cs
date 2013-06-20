@@ -41,8 +41,8 @@ namespace Menere
 
             available_account_types = new ObservableCollection<IAccount>();
             available_account_types.Add(new Model.FeverAccount());
-            available_account_types.Add(new Model.FeedbinAccount());
             available_account_types.Add(new Model.FeedlyAccount());
+            available_account_types.Add(new Model.FeedbinAccount());
             available_account_types.Add(new Model.TinyTinyAccount());
             available_account_types.Add(new Model.CommaFeedAccount());
 
@@ -64,8 +64,6 @@ namespace Menere
             app_program_path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
 
             AppNetDotNet.Model.Authorization.registerAppInRegistry(AppNetDotNet.Model.Authorization.registerBrowserEmulationValue.IE9Always);
-
-            
 
             try
             {
@@ -165,6 +163,14 @@ namespace Menere
             }
             main_window.combobox_accounts.ItemsSource = accounts;
             main_window.combobox_accounts.SelectedItem = accounts.Last();
+            main_window.button_show_all_Click(null, null);
+            if (e.NewItems != null)
+            {
+                foreach (IAccount added_account in e.NewItems)
+                {
+                    added_account.update_all_feeds();
+                }
+            }
             if (!main_window_opened && accounts.Count > 0)
             {
                 main_window.Show();
@@ -172,6 +178,7 @@ namespace Menere
             if (all_accounts_read)
             {
                 save_accounts();
+                main_window.button_refresh_Click(null, null);
             }
             if (accounts.Count > 1)
             {

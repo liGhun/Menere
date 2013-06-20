@@ -16,6 +16,8 @@ namespace Menere.Model
             items = new System.Collections.ObjectModel.ObservableCollection<IItem>();
             feeds = new System.Collections.ObjectModel.ObservableCollection<IFeed>();
             groups = new System.Collections.ObjectModel.ObservableCollection<IFolder>();
+            unread_items = new System.Collections.ObjectModel.ObservableCollection<IItem>();
+            saved_items = new System.Collections.ObjectModel.ObservableCollection<IItem>();
 
             backgroundWorker_update_entries = new BackgroundWorker();
             backgroundWorker_update_entries.WorkerReportsProgress = true;
@@ -44,10 +46,27 @@ namespace Menere.Model
                         if (item != null)
                         {
                             items.Add(item);
+
+                        }
+                        break;
+
+                    case 91:
+                        FeedlyItem unread_item = e.UserState as FeedlyItem;
+                        if (unread_item != null)
+                        {
+                            unread_items.Add(unread_item);
                             if (initial_fetch_completed)
                             {
-                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: item.feed.title, text: item.title, iconBase64: item.feed.icon_base64);
+                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title, icon:unread_item.feed.icon_path);
                             }
+                        }
+                        break;
+
+                    case 92:
+                        FeedlyItem saved_item = e.UserState as FeedlyItem;
+                        if (saved_item != null)
+                        {
+                            saved_items.Add(saved_item);
                         }
                         break;
 
@@ -78,11 +97,25 @@ namespace Menere.Model
             {
                 foreach (FeedlyFeed feed in feeds)
                 {
-                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, feed.id, count: 1000, unread_only: true);
+                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, feed.id, count: 100);
                     foreach (Entry entry in entries.items)
                     {
                         FeedlyItem item = new FeedlyItem(this, feed, entry);
                         backgroundWorker_update_entries.ReportProgress(90, item);
+                        if (!item.is_read)
+                        {
+                            backgroundWorker_update_entries.ReportProgress(91, item);
+                        }
+                        if (entry.tags != null)
+                        {
+                            IEnumerable<Tag> tags_saved = entry.tags.Where(t => t.id == string.Format("user/{0}/tag/global.saved", this.profile.id));
+                            if (tags_saved != null)
+                            {
+
+                                    backgroundWorker_update_entries.ReportProgress(92, item);
+                                
+                            }
+                        }
                         
                     }
                     if (entries.updated > this.newer_than || newer_than == null)
@@ -95,15 +128,17 @@ namespace Menere.Model
             {
                 try
                 {
-                    if (newer_than == null)
-                    {
-                        return;
-                    }
+
                     if (newer_than == 0)
                     {
                         return;
                     }
-                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 1000, unread_only: true, newer_than: newer_than);
+                    if (newer_than == null)
+                    {
+                        // seems like as if the initial fetch simply didn't get any items
+                        newer_than = 0;
+                    }
+                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 100, newer_than: newer_than);
                     foreach (Entry entry in entries.items)
                     {
                         IEnumerable<IItem> existing_item = items.Where(i => i.id == entry.id);
@@ -113,7 +148,7 @@ namespace Menere.Model
                             {
                                 if (existing_item.Count() > 0)
                                 {
-                                    return;
+                                    continue;
                                 }
                             }
                         }
@@ -213,6 +248,9 @@ namespace Menere.Model
             get;
             set;
         }
+        public System.Collections.ObjectModel.ObservableCollection<IItem> unread_items {get; set; }
+        public System.Collections.ObjectModel.ObservableCollection<IItem> saved_items { get; set; }
+
 
         public void get_token_by_refresh_token() {
             token = RSSharp.Feedly.ApiCalls.Authentications.get_access_token_by_refresh_token(refresh_token, "svenwalther", "PETIPURZBLQRYEBVWJN06ZLH", "refresh_token");
@@ -273,6 +311,7 @@ namespace Menere.Model
             {
                 foreach (Feed feed in available_feeds)
                 {
+                    if(string.IsNullOrWhiteSpace(feed.title)) {continue;}
                     FeedlyFeed feedly_feed = new FeedlyFeed(this, feed);
                     if (categories_in_subscription[feed.id] != null)
                     {

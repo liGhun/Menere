@@ -34,10 +34,23 @@ namespace Menere.Controls
                  IItem item = button.DataContext as IItem;
                  if (item != null)
                  {
-                     if (item.mark_read())
+                     if (!item.is_read)
                      {
-                         item.receiving_account.items.Remove(item);
+                         if (item.mark_read())
+                         {
+                             item.receiving_account.unread_items.Remove(item);
+                             item.is_read = true;
+                         }
                      }
+                     else
+                     {
+                         if (item.mark_unread())
+                         {
+                             item.receiving_account.unread_items.Add(item);
+                             item.is_read = false;
+                         }
+                     }
+
                  }
              }
         }

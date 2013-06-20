@@ -17,6 +17,7 @@ namespace Menere.Model
         string url { get; set; }
         string html { get; set; }
         bool is_read { get; set; }
+        bool is_saved { get; set; }
         DateTime created { get; set; }
 
         bool mark_read();
