@@ -21,6 +21,7 @@
     <!-- Icons -->
 
     <ImageSource x:Key="button_mark_item_read">/Menere;component/Images/ButtonsDark/glyphicons_198_ok.png</ImageSource>
+    <ImageSource x:Key="button_save_item">/Menere;component/Images/ButtonsDark/glyphicons_072_bookmark.png</ImageSource>
     <ImageSource x:Key="button_open_webbrowser">/Menere;component/Images/ButtonsDark/glyphicons_370_globe_af.png</ImageSource>
     <ImageSource x:Key="button_remove_filter">/Menere;component/Images/ButtonsDark/glyphicons_256_delete.png</ImageSource>
     <ImageSource x:Key="button_refresh">/Menere;component/Images/ButtonsDark/glyphicons_081_refresh.png</ImageSource>

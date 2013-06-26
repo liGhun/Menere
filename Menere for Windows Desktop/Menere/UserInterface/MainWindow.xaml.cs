@@ -34,6 +34,7 @@ namespace Menere.UserInterface
         public Model.IFolder current_filter_folder { get; set; }
         private int last_selected_index { get; set; }
         public ObservableCollection<IItem> current_shown_items { get; set; }
+        private bool goto_button_pressed { get; set; }
         
         public MainWindow()
         {
@@ -57,6 +58,8 @@ namespace Menere.UserInterface
             webbrowser.Navigated += webbrowser_Navigated;
             textblock_item_title.Text = "";
 
+            filter_feeds();
+
            // filter_feeds();
 
             update_timer = new DispatcherTimer();
@@ -73,10 +76,10 @@ namespace Menere.UserInterface
         void unread_items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             update_header_items();
-            
+            filter_feeds();
             if (AppController.Current.current_account.initial_fetch_completed)
             {
-                filter_feeds();
+                
                 filter_items();
             }
         }
@@ -191,7 +194,9 @@ namespace Menere.UserInterface
         {
             if(e!= null) 
             {
-                if (e.Key == Key.Space)
+                //AppController.Current.snarl_interface.Notify(title: "Key", text: e.Key.ToString());
+                // mark read / unread
+                if (e.Key == Key.Space || e.Key == Key.M)
                 {
                     Model.IItem item = listbox_items.SelectedItem as Model.IItem;
                     if (item != null)
@@ -215,6 +220,31 @@ namespace Menere.UserInterface
                     }
                 }
 
+                // save for later reading
+                if (e.Key == Key.S && !goto_button_pressed)
+                {
+                    Model.IItem item = listbox_items.SelectedItem as Model.IItem;
+                    if (item != null)
+                    {
+                        if (!item.is_saved)
+                        {
+                            if (item.mark_saved())
+                            {
+                                item.receiving_account.saved_items.Add(item);
+                            }
+                        }
+                        else
+                        {
+                            if (item.mark_unsaved())
+                            {
+                                item.receiving_account.saved_items.Remove(item);
+                            }
+                        }
+
+                    }
+                }
+
+                // move within items
                 if (e.Key == Key.J)
                 {
                     move_within_items(1);
@@ -223,6 +253,8 @@ namespace Menere.UserInterface
                 {
                     move_within_items(-1);
                 }
+
+                // open full inline
                 if (e.Key == Key.Return)
                 {
                     Model.IItem item = listbox_items.SelectedItem as Model.IItem;
@@ -231,7 +263,9 @@ namespace Menere.UserInterface
                         webbrowser.Navigate(item.url);
                     }
                 }
-                if (e.Key == Key.Right)
+
+                // open full in browser
+                if (e.Key == Key.Right || e.Key == Key.V)
                 {
                     Model.IItem item = listbox_items.SelectedItem as Model.IItem;
                     if (item != null)
@@ -240,6 +274,54 @@ namespace Menere.UserInterface
                     }
                     e.Handled = true;
                 }
+
+                if (e.Key == Key.F || e.Key.ToString() == "D7")
+                {
+                    textbox_filter_text.Focus();
+                    e.Handled = true;
+                }
+
+                // refresh
+                if (e.Key == Key.R)
+                {
+                    button_refresh_Click(null, null);
+                }
+
+                #region Goto function - always the last one in key handling!!!!
+
+                //
+                // goto functions
+                //
+
+                if (goto_button_pressed)
+                {
+                    if (e.Key == Key.A)
+                    {
+                        button_show_all_Click(null, null);
+                        listbox_items.Focus();
+                    }
+                    else if (e.Key == Key.S)
+                    {
+                        button_show_saved_Click(null, null);
+                        listbox_items.Focus();
+                    }
+                    else if (e.Key == Key.U)
+                    {
+                        button_show_unread_Click(null, null);
+                        listbox_items.Focus();
+                    }
+                }
+
+
+                goto_button_pressed = false;
+
+                // goto button pressed
+                if (e.Key == Key.G)
+                {
+                    goto_button_pressed = true;
+                }
+
+                #endregion
             }
         }
 
@@ -363,7 +445,7 @@ namespace Menere.UserInterface
 
                    if (!string.IsNullOrWhiteSpace(current_filter_string))
                    {
-                       string_filter = (item.title.ToLower().Contains(current_filter_string.ToLower()) || item.html.ToLower().Contains(current_filter_string.ToLower()));
+                       string_filter = (item.title.ToLower().Contains(current_filter_string.ToLower()) || item.html.ToLower().Contains(current_filter_string.ToLower())) || item.tag_string.ToLower().Contains(current_filter_string.ToLower());
                    }
 
                    return (feed_filter && string_filter && folder_filter);
@@ -414,6 +496,12 @@ namespace Menere.UserInterface
             if (chosen_account != null)
             {
                 AppController.Current.current_account = chosen_account;
+                if (account != null)
+                {
+                    account.items.CollectionChanged -= items_CollectionChanged;
+                    account.unread_items.CollectionChanged -= items_CollectionChanged;
+                    account.saved_items.CollectionChanged -= items_CollectionChanged;
+                }
                 account = chosen_account;
                 if (account.GetType() == typeof(FeverAccount) || account.GetType() == typeof(FeedlyAccount))
                 {
@@ -426,9 +514,18 @@ namespace Menere.UserInterface
                 this.textblock_foldername.Text = account.folder_name;
                 listbox_feeds.ItemsSource = account.feeds;
                 listbox_groups.ItemsSource = account.groups;
-                button_show_all_Click(null, null);
+                button_show_unread_Click(null, null);
                 update_header_items();
+                account.items.CollectionChanged += items_CollectionChanged;
+                account.unread_items.CollectionChanged += items_CollectionChanged;
+                account.saved_items.CollectionChanged += items_CollectionChanged;
             }
+        }
+
+        void items_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            update_header_items();
+            filter_feeds();
         }
 
         public void button_show_unread_Click(object sender, RoutedEventArgs e)
@@ -465,6 +562,7 @@ namespace Menere.UserInterface
             button_show_saved.IsEnabled = false;
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
+            listbox_items.ItemsSource = null;
             listbox_items.ItemsSource = account.saved_items;
             current_shown_items = account.saved_items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;

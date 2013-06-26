@@ -41,6 +41,14 @@ namespace Menere.Model
             {
                 switch (e.ProgressPercentage)
                 {
+                    case 10:
+                        FeedlyFeed feed = e.UserState as FeedlyFeed;
+                        if (feed != null)
+                        {
+                            feeds.Add(feed);
+                        }
+                        break;
+
                     case 90:
                         FeedlyItem item = e.UserState as FeedlyItem;
                         if (item != null)
@@ -93,110 +101,217 @@ namespace Menere.Model
 
         void backgroundWorker_update_entries_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (!first_fetch_completed)
-            {
-                foreach (FeedlyFeed feed in feeds)
-                {
-                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, feed.id, count: 100);
-                    foreach (Entry entry in entries.items)
-                    {
-                        FeedlyItem item = new FeedlyItem(this, feed, entry);
-                        backgroundWorker_update_entries.ReportProgress(90, item);
-                        if (!item.is_read)
-                        {
-                            backgroundWorker_update_entries.ReportProgress(91, item);
-                        }
-                        if (entry.tags != null)
-                        {
-                            IEnumerable<Tag> tags_saved = entry.tags.Where(t => t.id == string.Format("user/{0}/tag/global.saved", this.profile.id));
-                            if (tags_saved != null)
-                            {
+            Dictionary<string, FeedlyItem> known_items = new Dictionary<string, FeedlyItem>();
+            Dictionary<string, FeedlyFeed> fetched_feeds = new Dictionary<string, FeedlyFeed>();
 
-                                    backgroundWorker_update_entries.ReportProgress(92, item);
-                                
+            // to not have being altered lists during foreach
+            foreach (FeedlyItem item in this.items)
+            {
+                known_items.Add(item.id, item);
+            }
+            foreach (FeedlyFeed feed in this.feeds)
+            {
+                fetched_feeds.Add(feed.id, feed);
+            }
+            try
+            {
+                if (!first_fetch_completed)
+                {
+                    // fetching saved items first
+                    Streams.entries_list saved_entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/tag/global.saved", this.profile.id), count: 1000);
+                    foreach (Entry entry in saved_entries.items)
+                    {
+                        FeedlyFeed feed_of_entry = null;
+                        if (fetched_feeds.ContainsKey(entry.origin.streamId))
+                        {
+                            feed_of_entry = fetched_feeds[entry.origin.streamId];
+                        }
+                        else
+                        {
+                            Feed unknown_feed = RSSharp.Feedly.ApiCalls.Feeds.get(this.token.access_token, entry.origin.streamId);
+                            if (unknown_feed != null)
+                            {
+                                feed_of_entry = new FeedlyFeed(this, unknown_feed);
+                                fetched_feeds.Add(entry.origin.streamId, feed_of_entry);
+                                backgroundWorker_update_entries.ReportProgress(10, feed_of_entry);
+                            }
+                            else
+                            {
+                                continue;
                             }
                         }
-                        
+
+                        if (feed_of_entry != null)
+                        {
+                            FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
+                            item.is_saved = true;
+                            backgroundWorker_update_entries.ReportProgress(90, item);
+                            known_items.Add(item.id, item);
+                            if (!item.is_read)
+                            {
+                                backgroundWorker_update_entries.ReportProgress(91, item);
+                            }
+                            backgroundWorker_update_entries.ReportProgress(92, item);
+                        }
                     }
-                    if (entries.updated > this.newer_than || newer_than == null)
+
+                    // now we are getting the unread ones
+                    Streams.entries_list unread_entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 1000, unread_only: true);
+                    foreach (Entry entry in unread_entries.items)
                     {
-                        backgroundWorker_update_entries.ReportProgress(100, entries.updated);
+                        if (known_items.ContainsKey(entry.id))
+                        {
+                            continue;
+                        }
+
+                        FeedlyFeed feed_of_entry = null;
+                        if (fetched_feeds.ContainsKey(entry.origin.streamId))
+                        {
+                            feed_of_entry = fetched_feeds[entry.origin.streamId];
+                        }
+                        else
+                        {
+                            Feed unknown_feed = RSSharp.Feedly.ApiCalls.Feeds.get(this.token.access_token, entry.origin.streamId);
+                            if (unknown_feed != null)
+                            {
+                                feed_of_entry = new FeedlyFeed(this, unknown_feed);
+                                fetched_feeds.Add(entry.origin.streamId, feed_of_entry);
+                                backgroundWorker_update_entries.ReportProgress(10, feed_of_entry);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                        }
+
+
+                        if (feed_of_entry != null)
+                        {
+                            FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
+                            item.is_read = false;
+                            known_items.Add(item.id, item);
+                            backgroundWorker_update_entries.ReportProgress(90, item);
+                            backgroundWorker_update_entries.ReportProgress(91, item);
+                            if (entry.tags != null)
+                            {
+                                List<Tag> tags_saved = entry.tags.Where(t => t.id == string.Format("user/{0}/tag/global.saved", this.profile.id)) as List<Tag>;
+                                if (tags_saved != null)
+                                {
+                                    if (tags_saved.Count > 0)
+                                    {
+                                        item.is_saved = true;
+                                        backgroundWorker_update_entries.ReportProgress(92, item);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+
+                    // finally we go through feeds for more items
+                    foreach (FeedlyFeed feed in fetched_feeds.Values)
+                    {
+                        Streams.entries_list feed_entries = Streams.get_entries_in_stream(this.token.access_token, feed.id, count: 100);
+                        foreach (Entry entry in feed_entries.items)
+                        {
+                            if (known_items.ContainsKey(entry.id))
+                            {
+                                continue;
+                            }
+
+                            FeedlyItem item = new FeedlyItem(this, feed, entry);
+                            backgroundWorker_update_entries.ReportProgress(90, item);
+                            known_items.Add(item.id, item);
+                            if (!item.is_read)
+                            {
+                                backgroundWorker_update_entries.ReportProgress(91, item);
+                            }
+                            if (entry.tags != null)
+                            {
+                                List<Tag> tags_saved = entry.tags.Where(t => t.id == string.Format("user/{0}/tag/global.saved", this.profile.id)) as List<Tag>;
+                                if (tags_saved != null)
+                                {
+                                    try
+                                    {
+                                        Tag tag = tags_saved.First();
+                                        if (tags_saved.Count() > 0)
+                                        {
+                                            item.is_saved = true;
+                                            backgroundWorker_update_entries.ReportProgress(92, item);
+                                        }
+                                    }
+                                    catch (Exception exp) { 
+                                        Console.WriteLine(exp.Message);
+                                    }
+                                }
+                            }
+
+                        }
+                        if (feed_entries.updated > this.newer_than || newer_than == null)
+                        {
+                            backgroundWorker_update_entries.ReportProgress(100, feed_entries.updated);
+                        }
                     }
                 }
-            }
-            else
-            {
-                try
+                else
                 {
-
-                    if (newer_than == 0)
+                    try
                     {
-                        return;
-                    }
-                    if (newer_than == null)
-                    {
-                        // seems like as if the initial fetch simply didn't get any items
-                        newer_than = 0;
-                    }
-                    Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 100, newer_than: newer_than);
-                    foreach (Entry entry in entries.items)
-                    {
-                        IEnumerable<IItem> existing_item = items.Where(i => i.id == entry.id);
-                        try
+                        Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 100, newer_than: newer_than);
+                        foreach (Entry entry in entries.items)
                         {
-                            if (existing_item != null)
+                            if (known_items.ContainsKey(entry.id))
                             {
-                                if (existing_item.Count() > 0)
+                                continue;
+                            }
+
+
+                            FeedlyFeed feed_of_entry = null;
+                            if (fetched_feeds.ContainsKey(entry.origin.streamId))
+                            {
+                                feed_of_entry = fetched_feeds[entry.origin.streamId];
+                            }
+                            else
+                            {
+                                Feed unknown_feed = RSSharp.Feedly.ApiCalls.Feeds.get(this.token.access_token, entry.origin.streamId);
+                                if (unknown_feed != null)
+                                {
+                                    feed_of_entry = new FeedlyFeed(this, unknown_feed);
+                                    fetched_feeds.Add(entry.origin.streamId, feed_of_entry);
+                                    backgroundWorker_update_entries.ReportProgress(10, feed_of_entry);
+                                }
+                                else
                                 {
                                     continue;
                                 }
                             }
-                        }
-                        catch { }
 
-                        IEnumerable<IFeed> feeds_of_entry = feeds.Where(f => f.id == entry.origin.streamId);
-                        if (feeds_of_entry != null)
-                        {
-                            if (feeds_of_entry.Count() > 0)
+                            if (feed_of_entry != null)
                             {
-                                FeedlyFeed feed_of_entry = feeds_of_entry.First() as FeedlyFeed;
-                                if (feeds_of_entry != null)
-                                {
-                                    FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
-                                    backgroundWorker_update_entries.ReportProgress(90, item);
-                                }
+                                FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
+                                backgroundWorker_update_entries.ReportProgress(90, item);
+                                known_items.Add(item.id, item);
+                            }
+
+                            if (entries.updated > this.newer_than || newer_than == null)
+                            {
+                                backgroundWorker_update_entries.ReportProgress(100, entries.updated);
                             }
                         }
-
-
-                        if (feeds_of_entry != null)
-                        {
-                            if (feeds_of_entry.Count() > 0)
-                            {
-                                FeedlyFeed feed_of_entry = feeds_of_entry.First() as FeedlyFeed;
-                                if (feeds_of_entry != null)
-                                {
-                                    FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
-                                    backgroundWorker_update_entries.ReportProgress(90, item);
-
-                                    
-                                }
-                            }
-                        }
-
-
-                        
                     }
-                    if (entries.updated > this.newer_than || newer_than == null)
+                    catch (Exception exp)
                     {
-                        backgroundWorker_update_entries.ReportProgress(100, entries.updated);
+                        Console.WriteLine(exp.Message);
                     }
-                }
-                catch (Exception exp)
-                {
-                    Console.WriteLine(exp.Message);
                 }
             }
+            catch (Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
+
+            fetched_feeds = null;
+            known_items = null;
         }
 
         private BackgroundWorker backgroundWorker_update_entries;
@@ -285,6 +400,10 @@ namespace Menere.Model
 
         public bool check_credentials()
         {
+            if (this.token == null)
+            {
+                return false;
+            }
             this.profile = Profiles.get(this.token.access_token);
             if (profile != null)
             {
@@ -311,25 +430,34 @@ namespace Menere.Model
             {
                 foreach (Feed feed in available_feeds)
                 {
-                    if(string.IsNullOrWhiteSpace(feed.title)) {continue;}
-                    FeedlyFeed feedly_feed = new FeedlyFeed(this, feed);
-                    if (categories_in_subscription[feed.id] != null)
+                    try
                     {
-                        foreach (Category category in categories_in_subscription[feed.id])
+                        if (string.IsNullOrWhiteSpace(feed.title)) {
+                            feed.title = "<no name>";
+                        }
+                        FeedlyFeed feedly_feed = new FeedlyFeed(this, feed);
+                        if (categories_in_subscription[feed.id] != null)
                         {
-                            IEnumerable<IFolder> cat_of_feed = groups.Where(g => g.name == category.label);
-                            if (cat_of_feed != null)
+                            foreach (Category category in categories_in_subscription[feed.id])
                             {
-                                if (cat_of_feed.Count() > 0)
+                                List<IFolder> cat_of_feed = groups.Where(g => g.name == category.label) as List<IFolder>;
+                                if (cat_of_feed != null)
                                 {
-                                    FeedlyFolder folder = cat_of_feed.First() as FeedlyFolder;
-                                    folder.feeds.Add(feedly_feed);
+                                    if (cat_of_feed.Count > 0)
+                                    {
+                                        FeedlyFolder folder = cat_of_feed.First() as FeedlyFolder;
+                                        folder.feeds.Add(feedly_feed);
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    feeds.Add(feedly_feed);
+                        feeds.Add(feedly_feed);
+                    }
+                    catch (Exception exp)
+                    {
+                        Console.WriteLine(exp.Message);
+                    }
 
                 }
             }

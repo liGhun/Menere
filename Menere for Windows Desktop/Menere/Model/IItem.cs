@@ -19,8 +19,11 @@ namespace Menere.Model
         bool is_read { get; set; }
         bool is_saved { get; set; }
         DateTime created { get; set; }
+        string tag_string { get; }
 
         bool mark_read();
         bool mark_unread();
+        bool mark_saved();
+        bool mark_unsaved();
     }
 }

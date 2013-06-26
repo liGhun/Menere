@@ -124,47 +124,6 @@ namespace Menere.Model
             {
                 backgroundWorker_update_entries.RunWorkerAsync();
             }
-            /*
-            SharpFever.Model.FeverResponse unread_items_ids = fever_account.get_unread_item_ids();
-            if (unread_items_ids != null)
-            {
-                if (unread_items_ids.unread_item_ids_list.Count > 0)
-                {
-                    while (unread_items_ids.unread_item_ids_list.Count > 0)
-                    {
-                        List<uint> ids = unread_items_ids.unread_item_ids_list.GetRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
-                        unread_items_ids.unread_item_ids_list.RemoveRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
-                        SharpFever.Model.FeverResponse unread_fever_items = fever_account.get_items(with_ids: ids);
-                        foreach (SharpFever.Model.Item fever_item in unread_fever_items.items)
-                        {
-                            IItem existing_item = null;
-                            try
-                            {
-                                existing_item = unread_items.Where(item => item.id == fever_item.id.ToString()).First();
-                            }
-                            catch { }
-                            if (existing_item == null)
-                            {
-                                Model.FeverItem item = new Model.FeverItem(fever_item, this);
-                                item.receiving_account = this;
-                                unread_items.Add(item);
-                                if (first_fetch_completed)
-                                {
-                                    AppController.Current.snarl_interface.Notify(classId: "New unread item", title: item.feed.title, text: item.title, iconBase64: item.feed.icon_base64);
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    items.Clear();
-                }
-            }
-            first_fetch_completed = true;
-            initial_fetch_completed = true;
-            AppController.Current.update_filter();
-             * */
             return true;
         }
 
@@ -280,6 +239,15 @@ namespace Menere.Model
             {
                 switch (e.ProgressPercentage)
                 {
+                    case 10:
+                        FeverFeed feed = e.UserState as FeverFeed;
+                        if (feed != null)
+                        {
+                            feeds.Add(feed);
+
+                        }
+                        break;
+
                     case 90:
                         FeverItem item = e.UserState as FeverItem;
                         if (item != null)
@@ -331,6 +299,81 @@ namespace Menere.Model
 
         void backgroundWorker_update_entries_DoWork(object sender, DoWorkEventArgs e)
         {
+            Dictionary<string, FeverItem> known_items = new Dictionary<string, FeverItem>();
+            Dictionary<string, FeverFeed> fetched_feeds = new Dictionary<string, FeverFeed>();
+
+            // to not have being altered lists during foreach
+            foreach (FeverItem item in this.items)
+            {
+                known_items.Add(item.id, item);
+            }
+            foreach (FeverFeed feed in this.feeds)
+            {
+                fetched_feeds.Add(feed.id, feed);
+            }
+
+            if (!first_fetch_completed)
+            {
+                SharpFever.Model.FeverResponse unread_items_ids = fever_account.get_unread_item_ids();
+                if (unread_items_ids != null)
+                {
+                    if (unread_items_ids.unread_item_ids_list.Count > 0)
+                    {
+                        while (unread_items_ids.unread_item_ids_list.Count > 0)
+                        {
+                            List<uint> ids = unread_items_ids.unread_item_ids_list.GetRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
+                            unread_items_ids.unread_item_ids_list.RemoveRange(0, Math.Min(unread_items_ids.unread_item_ids_list.Count, 50));
+                            SharpFever.Model.FeverResponse unread_fever_items = fever_account.get_items(with_ids: ids);
+                            foreach (SharpFever.Model.Item entry in unread_fever_items.items)
+                            {
+                                if (known_items.ContainsKey(entry.id.ToString()))
+                                {
+                                    continue;
+                                }
+                                FeverFeed feed_of_entry = null;
+                                if (fetched_feeds.ContainsKey(entry.feed_id.ToString()))
+                                {
+                                    feed_of_entry = fetched_feeds[entry.feed_id.ToString()];
+                                }
+                                else
+                                {
+                                    FeverResponse available_feeds = fever_account.get_feeds();
+                                    foreach (SharpFever.Model.Feed feed in available_feeds.feeds)
+                                    {
+                                        if (!fetched_feeds.ContainsKey(feed.id.ToString()))
+                                        {
+                                            FeverFeed new_feed = new FeverFeed(feed, this);
+                                            fetched_feeds.Add(new_feed.id, new_feed);
+                                            backgroundWorker_update_entries.ReportProgress(10, new_feed);
+                                            if (new_feed.id == entry.feed_id.ToString())
+                                            {
+                                                feed_of_entry = new_feed;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (feed_of_entry == null)
+                                {
+                                    continue;
+                                }
+
+
+
+                                Model.FeverItem item = new Model.FeverItem(entry, this, feed_of_entry);
+                                known_items.Add(item.id, item);
+                                item.receiving_account = this;
+                                backgroundWorker_update_entries.ReportProgress(90, item);
+
+                                backgroundWorker_update_entries.ReportProgress(91, item);
+                            }
+                        }
+                    }
+                }
+               // first_fetch_completed = true;
+               // initial_fetch_completed = true;
+            }
+            
             uint max_id = this.max_id_fetched;
             FeverResponse entries = new FeverResponse();
             entries.items = new ObservableCollection<Item>();
@@ -339,24 +382,42 @@ namespace Menere.Model
                   if(entries == null) {return;}
                     foreach (SharpFever.Model.Item entry in entries.items)
                     {
-                        IEnumerable<IItem> existing_item = items.Where(i => i.id == entry.id.ToString());
-                        try
+                        if(known_items.ContainsKey(entry.id.ToString())) 
                         {
-                            if (existing_item != null)
+                            continue;
+                        }
+
+                        FeverFeed feed_of_entry = null;
+                        if (fetched_feeds.ContainsKey(entry.feed_id.ToString()))
+                        {
+                            feed_of_entry = fetched_feeds[entry.feed_id.ToString()];
+                        }
+                        else
+                        {
+                            FeverResponse available_feeds = fever_account.get_feeds();
+                            foreach (SharpFever.Model.Feed feed in available_feeds.feeds)
                             {
-                                if (existing_item.Count() > 0)
+                                if (!fetched_feeds.ContainsKey(feed.id.ToString()))
                                 {
-                                    continue;
+                                    FeverFeed new_feed = new FeverFeed(feed, this);
+                                    fetched_feeds.Add(new_feed.id, new_feed);
+                                    backgroundWorker_update_entries.ReportProgress(10, new_feed);
+                                    if (new_feed.id == entry.feed_id.ToString())
+                                    {
+                                        feed_of_entry = new_feed;
+                                    }
                                 }
                             }
                         }
-                        catch { }
 
+                        if (feed_of_entry == null)
+                        {
+                            continue;
+                        }
 
-                        FeverItem item = new FeverItem(entry,this);
+                        FeverItem item = new FeverItem(entry,this, feed_of_entry);
+                        known_items.Add(item.id, item);
                         item.receiving_account = this;
-                        backgroundWorker_update_entries.ReportProgress(90, item);
-
 
                         backgroundWorker_update_entries.ReportProgress(90, item);
                         if (!item.is_read)

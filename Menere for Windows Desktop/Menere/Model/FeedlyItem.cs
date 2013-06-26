@@ -17,6 +17,7 @@ namespace Menere.Model
             this.feed_id = feed_id;
             this.receiving_account = account;
             this.feed = feed;
+            is_read = true;
         }
 
         public string id
@@ -176,6 +177,71 @@ namespace Menere.Model
         public bool mark_unread()
         {
             return false;
+        }
+
+
+        public bool mark_saved()
+        {
+            if (!is_saved)
+            {
+                FeedlyAccount account = this.receiving_account as FeedlyAccount;
+                string save_id = string.Format("user/{0}/tag/global.saved", System.Web.HttpUtility.UrlEncode(account.profile.id));
+
+                bool success = RSSharp.Feedly.ApiCalls.Tags.add_to_entry(account.token.access_token, this.feedly_entry.id, save_id);
+                if (success)
+                {
+                    this.is_saved = true;
+                }
+                return success;
+            }
+            return true;
+        }
+
+        public bool mark_unsaved()
+        {
+            if (is_saved)
+            {
+                FeedlyAccount account = this.receiving_account as FeedlyAccount;
+                string save_id = string.Format("user/{0}/tag/global.saved", account.profile.id);
+                List<string> entries = new List<string>();
+                entries.Add(this.feedly_entry.id);
+                List<string> tags = new List<string>();
+                tags.Add(save_id);
+
+                bool success = RSSharp.Feedly.ApiCalls.Tags.delete_multiple_from_entries(account.token.access_token, entries, tags);
+                if (success)
+                {
+                    this.is_saved = false;
+                }
+                return success;
+            }
+            return true;
+        }
+
+
+        public string tag_string
+        {
+            get {
+                if(this.html.Contains("florist")) {
+                    Console.WriteLine("bla");
+                }
+
+                if (feedly_entry.tags != null)
+                {
+                    string return_value = "";
+                    foreach (Tag tag in feedly_entry.tags)
+                    {
+                        if (!tag.label.StartsWith("global."))
+                        {
+                            return_value += tag.label + ",";
+                        }
+                    }
+                    char[] trim_chars = { ',', ' ' };
+                    return_value = return_value.TrimEnd(trim_chars);
+                    return return_value;
+                }
+                return "";
+            }
         }
     }
 }

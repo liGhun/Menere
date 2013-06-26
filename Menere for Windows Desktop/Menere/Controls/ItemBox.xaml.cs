@@ -107,6 +107,33 @@ namespace Menere.Controls
             }
         }
 
+        private void button_save_item_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            if (button != null)
+            {
+                IItem item = button.DataContext as IItem;
+                if (item != null)
+                {
+                    if (!item.is_saved)
+                    {
+                        if (item.mark_saved())
+                        {
+                            item.receiving_account.saved_items.Add(item);
+                        }
+                    }
+                    else
+                    {
+                        if (item.mark_unsaved())
+                        {
+                            item.receiving_account.saved_items.Remove(item);
+                        }
+                    }
+
+                }
+            }
+        }
+
   
     }
 }

@@ -10,10 +10,11 @@ namespace Menere.Model
     {
         public SharpFever.Model.Item fever_item;
 
-        public FeverItem(SharpFever.Model.Item item, IAccount account)
+        public FeverItem(SharpFever.Model.Item item, IAccount account, FeverFeed feed)
         {
             fever_item = item;
             this.receiving_account = account;
+            this.feed = feed;
         }
 
         public string id
@@ -42,15 +43,8 @@ namespace Menere.Model
 
         public IFeed feed
         {
-            get
-            {
-                    return receiving_account.feeds.Where(feed => feed.id == this.feed_id).First();
-
-            }
-            set
-            {
-                
-            }
+            get;
+            set;
         }
 
         public string title
@@ -161,6 +155,46 @@ namespace Menere.Model
         {
             get;
             set;
+        }
+
+
+        public bool mark_saved()
+        {
+            FeverAccount rev_account = this.receiving_account as FeverAccount;
+            if (rev_account != null)
+            {
+                bool success = rev_account.fever_account.mark_item_as_saved(this.fever_item);
+                if (success)
+                {
+                    is_saved = true;
+                }
+                return success;
+            }
+            return false;
+        }
+
+        public bool mark_unsaved()
+        {
+            FeverAccount rev_account = this.receiving_account as FeverAccount;
+            if (rev_account != null)
+            {
+                bool success = rev_account.fever_account.mark_item_as_unsaved(this.fever_item);
+                if (success)
+                {
+                    is_saved = false;
+                }
+                return success;
+            }
+            return false;
+        }
+
+
+        public string tag_string
+        {
+            get {
+                // Fever has no tags or simlar
+                return "";
+            }
         }
     }
 }

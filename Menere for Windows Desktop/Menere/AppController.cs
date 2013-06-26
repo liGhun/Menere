@@ -163,7 +163,7 @@ namespace Menere
             }
             main_window.combobox_accounts.ItemsSource = accounts;
             main_window.combobox_accounts.SelectedItem = accounts.Last();
-            main_window.button_show_all_Click(null, null);
+            main_window.button_show_unread_Click(null, null);
             if (e.NewItems != null)
             {
                 foreach (IAccount added_account in e.NewItems)

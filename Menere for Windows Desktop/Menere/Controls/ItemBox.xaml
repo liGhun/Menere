@@ -11,7 +11,8 @@
             <Grid.Resources>
                 <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
             </Grid.Resources>
-            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" ToolTip="Mark as read: space&#x0a;Next item: arrow down or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow">
+            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" 
+                                    ToolTip="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: arrow down or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu">
                 <VirtualizingStackPanel Name="stackpanel_item_header" Orientation="Horizontal">
                     <Image Source="{Binding Path=feed.icon_path}"  Name="image_faviconItem" MinWidth="24" Height="24" MaxHeight="32" MaxWidth="32" Margin="0,2,9,2" ImageFailed="image_faviconItem_ImageFailed">
                         <Image.Effect>
@@ -23,13 +24,16 @@
                         <TextBlock Name="textblock_title" Text="{Binding Path=title}" Foreground="{DynamicResource ResourceKey=color_main_foreground}"/>
                         <VirtualizingStackPanel Orientation="Horizontal">
                             <TextBlock Name="textblock_date" FontSize="9" Text="{Binding Path=created}" Foreground="{DynamicResource ResourceKey=color_date}" Margin="0,0,10,0"/>
-                            <Button Name="button_mark_read" ToolTip="Mark as read (space)" Click="button_mark_read_Click" Width="14" Height="14" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
+                            <Button Name="button_mark_read" ToolTip="Mark as read (space)" Click="button_mark_read_Click" Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
                                 <Image Name="image_button_mark_item_read" Source="{DynamicResource button_mark_item_read}" />
                             </Button>
-                            <Button Name="button_open_url" ToolTip="Open in webbrowser (right arrow)" Click="button_open_url_Click"  Width="14" Height="14" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
+                            <Button Name="button_save_item" ToolTip="Save item (s)" Click="button_save_item_Click" Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
+                                <Image Name="image_button_save_item" Source="{DynamicResource button_save_item}" />
+                            </Button>
+                            <Button Name="button_open_url" ToolTip="Open in webbrowser (right arrow)" Click="button_open_url_Click"  Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
                                 <Image Name="image_button_open_in_webbrowser" Source="{DynamicResource button_open_webbrowser}" />
                             </Button>
-
+                            <TextBlock Name="textblock_tags" FontSize="9" Text="{Binding Path=tag_string}" Foreground="{DynamicResource ResourceKey=color_date}" Margin="0,0,10,0"/>
                         </VirtualizingStackPanel>
                     </VirtualizingStackPanel>
                 </VirtualizingStackPanel>

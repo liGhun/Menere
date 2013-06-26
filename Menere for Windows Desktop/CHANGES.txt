@@ -1,3 +1,11 @@
+0.7
+Greatly improved intial fetch: get saved and unread items very fast while all other items are fetched afterwards
+Items can now be saved for later reading (and unsaved of course)
+Many new keyboard shortcuts
+Tags are now displayed at the bottom of the entry (Feedly only)
+Search / filter now also searches within set tags for entry
+Bug fixes
+
 0.6
 Access to read items and saved items added
 Fever now also fetches read items
