@@ -7,12 +7,17 @@
              d:DesignHeight="300" d:DesignWidth="300"
              xmlns:converters="clr-namespace:Menere.Converters">
     <Border x:Name="border_around_item" Style="{DynamicResource theme_border_around_item}" HorizontalAlignment="Stretch">
+        <Border.ContextMenu>
+            <ContextMenu Name="context_menu">
+                <MenuItem Name="contextMenu_edit_tags" Click="contextMenu_edit_tags_Click" Header="Edit item" />
+            </ContextMenu>
+        </Border.ContextMenu>
         <Grid MouseDown="Grid_MouseDown" Style="{DynamicResource theme_grid_around_item}">
             <Grid.Resources>
                 <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
             </Grid.Resources>
             <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" 
-                                    ToolTip="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: arrow down or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu">
+                                    ToolTip="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: down arrow or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu">
                 <VirtualizingStackPanel Name="stackpanel_item_header" Orientation="Horizontal">
                     <Image Source="{Binding Path=feed.icon_path}"  Name="image_faviconItem" MinWidth="24" Height="24" MaxHeight="32" MaxWidth="32" Margin="0,2,9,2" ImageFailed="image_faviconItem_ImageFailed">
                         <Image.Effect>
@@ -24,14 +29,97 @@
                         <TextBlock Name="textblock_title" Text="{Binding Path=title}" Foreground="{DynamicResource ResourceKey=color_main_foreground}"/>
                         <VirtualizingStackPanel Orientation="Horizontal">
                             <TextBlock Name="textblock_date" FontSize="9" Text="{Binding Path=created}" Foreground="{DynamicResource ResourceKey=color_date}" Margin="0,0,10,0"/>
-                            <Button Name="button_mark_read" ToolTip="Mark as read (space)" Click="button_mark_read_Click" Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
-                                <Image Name="image_button_mark_item_read" Source="{DynamicResource button_mark_item_read}" />
+                            <Button Name="button_mark_read" ToolTip="Mark as read (space)" Click="button_mark_read_Click" Width="12" Height="12" Margin="0,0,4,0">
+                                <Button.Style>
+                                    <Style>
+                                        <Setter Property="Button.Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger  Property="UIElement.IsMouseOver" Value="True">
+                                                <Setter Property="UIElement.Opacity" Value="1" />
+                                            </Trigger>
+
+                                            <DataTrigger Binding="{Binding is_read}" Value="False">
+                                                <Setter Property="Button.Opacity" Value="0.5"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding is_read}" Value="True">
+                                                <Setter Property="Button.Opacity" Value="1"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+
+                                    </Style>
+                                </Button.Style>
+                                <Image Name="image_button_mark_item_read">
+                                    <Image.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding is_read}" Value="False">
+                                                    <Setter Property="Image.Source" Value="{DynamicResource button_mark_item_read}"/>
+                                                    <Setter Property="Image.ToolTip" Value="Mark item read (space)" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding is_read}" Value="True">
+                                                    <Setter Property="Image.Source" Value="{DynamicResource button_mark_item_unread}"/>
+                                                    <Setter Property="Image.ToolTip" Value="Mark item unread (space)" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
                             </Button>
-                            <Button Name="button_save_item" ToolTip="Save item (s)" Click="button_save_item_Click" Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
-                                <Image Name="image_button_save_item" Source="{DynamicResource button_save_item}" />
+                            <Button Name="button_save_item" Click="button_save_item_Click" Width="12" Height="12" Margin="0,0,4,0">
+                                <Button.Style>
+                                    <Style>
+                                        <Setter Property="Button.Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <ContentPresenter Content="{TemplateBinding Content}" />
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger  Property="UIElement.IsMouseOver" Value="True">
+                                                <Setter Property="UIElement.Opacity" Value="1" />
+                                            </Trigger>
+  
+                                            <DataTrigger Binding="{Binding is_saved}" Value="False">
+                                                <Setter Property="Button.Opacity" Value="0.5"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding is_saved}" Value="True">
+                                                <Setter Property="Button.Opacity" Value="1"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+
+                                    </Style>
+                                </Button.Style>
+                                <Image Name="image_button_save_item">
+                                    <Image.Style>
+                                        <Style>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding is_saved}" Value="False">
+                                                    <Setter Property="Image.Source" Value="{DynamicResource button_save_item}"/>
+                                                    <Setter Property="Image.ToolTip" Value="Save item (s)" />
+                                                    
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding is_saved}" Value="True">
+                                                    <Setter Property="Image.Source" Value="{DynamicResource button_saved_item}"/>
+                                                    <Setter Property="Image.ToolTip" Value="Remove saved state (s)" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                            
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
                             </Button>
                             <Button Name="button_open_url" ToolTip="Open in webbrowser (right arrow)" Click="button_open_url_Click"  Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
-                                <Image Name="image_button_open_in_webbrowser" Source="{DynamicResource button_open_webbrowser}" />
+                                <Image Name="image_button_open_in_webbrowser" Source="{DynamicResource button_open_webbrowser}">
+                                    
+                                </Image>
                             </Button>
                             <TextBlock Name="textblock_tags" FontSize="9" Text="{Binding Path=tag_string}" Foreground="{DynamicResource ResourceKey=color_date}" Margin="0,0,10,0"/>
                         </VirtualizingStackPanel>

@@ -16,6 +16,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
+using System.Threading;
 using Menere.Model;
 
 namespace Menere.UserInterface
@@ -55,8 +56,16 @@ namespace Menere.UserInterface
             listbox_items.ItemsSource = account.items;
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
-            webbrowser.Navigated += webbrowser_Navigated;
+           // webbrowser.Navigated += webbrowser_Navigated;
             textblock_item_title.Text = "";
+
+            if (Properties.Settings.Default.windowHeight > 0 && Properties.Settings.Default.windowWidth > 0)
+            {
+                this.Height = Properties.Settings.Default.windowHeight;
+                this.Width = Properties.Settings.Default.windowWidth;
+                this.Left = Properties.Settings.Default.windowLocationX;
+                this.Top = Properties.Settings.Default.windowLocationY;
+            }
 
             filter_feeds();
 
@@ -130,24 +139,26 @@ namespace Menere.UserInterface
 
         public void HideScriptErrors(WebBrowser wb, bool Hide)
         {
-            FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
-                        if (fiComWebBrowser == null) return;
+            try
+            {
+                FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField("_axIWebBrowser2", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fiComWebBrowser == null) return;
 
-            object objComWebBrowser = fiComWebBrowser.GetValue(wb);
+                object objComWebBrowser = fiComWebBrowser.GetValue(wb);
 
-            if (objComWebBrowser == null) return;
+                if (objComWebBrowser == null) return;
 
-            objComWebBrowser.GetType().InvokeMember(
+                objComWebBrowser.GetType().InvokeMember(
 
-            "Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
-
+                "Silent", BindingFlags.SetProperty, null, objComWebBrowser, new object[] { Hide });
+            }
+            catch { }
         }
 
 
         void webbrowser_Navigated(object sender, NavigationEventArgs e)
         {
-            HideScriptErrors(webbrowser,
-            true);
+            HideScriptErrors(webbrowser, true);
         }
 
         public  void button_refresh_Click(object sender, RoutedEventArgs e)
@@ -182,6 +193,7 @@ namespace Menere.UserInterface
                 " <div id=\"content\">\n" +
                 "  {4}\n" +
                 " </div>\n" +
+                " <br />\n" +
                 " <div id=\"link_to_full_article\">\n" +
                 "  <a href=\"{5}\">Read full article</a>\n" +
                 " </div>\n" +
@@ -203,19 +215,27 @@ namespace Menere.UserInterface
                     {
                         if (!item.is_read)
                         {
-                            if (item.mark_read())
+                            ThreadPool.QueueUserWorkItem(delegate
                             {
+                                item.mark_read();
+                            });
+                            item.is_read = true;
+                            try {
                                 item.receiving_account.unread_items.Remove(item);
-                                item.is_read = true;
-                            }
+                            } catch {}
                         }
                         else
                         {
-                            if (item.mark_read())
-                            {
-                                item.receiving_account.unread_items.Add(item);
-                                item.is_read = false;
-                            }
+                            ThreadPool.QueueUserWorkItem(delegate
+                             {
+                                item.mark_unread();
+                             });
+                             item.is_read = false;
+                             try
+                             {
+                                 item.receiving_account.unread_items.Add(item);
+                             }
+                             catch { }
                         }
                     }
                 }
@@ -228,17 +248,27 @@ namespace Menere.UserInterface
                     {
                         if (!item.is_saved)
                         {
-                            if (item.mark_saved())
+                            ThreadPool.QueueUserWorkItem(delegate
+                            {
+                                item.mark_saved();
+                            });
+                            try
                             {
                                 item.receiving_account.saved_items.Add(item);
                             }
+                            catch { }
                         }
                         else
                         {
-                            if (item.mark_unsaved())
+                            ThreadPool.QueueUserWorkItem(delegate
+                            {
+                                item.mark_unsaved();
+                            });
+                            try
                             {
                                 item.receiving_account.saved_items.Remove(item);
                             }
+                            catch { }
                         }
 
                     }
@@ -425,30 +455,46 @@ namespace Menere.UserInterface
                        return false;
                    }
 
-                   bool feed_filter = true;
-                   bool string_filter = true;
-                   bool folder_filter = true;
-                   if (current_filter_feed != null)
+                   try
                    {
-                       if (current_filter_feed.id != item.feed_id)
+                       bool feed_filter = true;
+                       bool string_filter = true;
+                       bool folder_filter = true;
+                       if (current_filter_feed != null)
                        {
-                           feed_filter = false;
+                           if (current_filter_feed.id != item.feed_id)
+                           {
+                               feed_filter = false;
+                           }
                        }
-                   }
-                   if (current_filter_folder != null)
-                   {
-                       if (!current_filter_folder.feeds.Contains(item.feed))
+                       if (current_filter_folder != null)
                        {
-                           folder_filter = false;
+                           if (!current_filter_folder.feeds.Contains(item.feed))
+                           {
+                               folder_filter = false;
+                           }
                        }
-                   }
 
-                   if (!string.IsNullOrWhiteSpace(current_filter_string))
+                       if (!string.IsNullOrWhiteSpace(current_filter_string))
+                       {
+                           if (item.html == null)
+                           {
+                               item.html = "";
+                           }
+                           if (item.title == null)
+                           {
+                               item.title = "";
+                           }
+                           string_filter = (item.title.ToLower().Contains(current_filter_string.ToLower()) || item.html.ToLower().Contains(current_filter_string.ToLower())) || item.tag_string.ToLower().Contains(current_filter_string.ToLower());
+                       }
+
+                       return (feed_filter && string_filter && folder_filter);
+                   }
+                   catch (Exception exp)
                    {
-                       string_filter = (item.title.ToLower().Contains(current_filter_string.ToLower()) || item.html.ToLower().Contains(current_filter_string.ToLower())) || item.tag_string.ToLower().Contains(current_filter_string.ToLower());
+                       AppController.add_debug_message(exp);
+                       return true;
                    }
-
-                   return (feed_filter && string_filter && folder_filter);
                };
         }
 
@@ -546,7 +592,7 @@ namespace Menere.UserInterface
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
             filter_feeds();
-            listbox_items.UpdateLayout();
+            //listbox_items.UpdateLayout();
         }
 
         public void button_show_saved_Click(object sender, RoutedEventArgs e)
@@ -568,7 +614,7 @@ namespace Menere.UserInterface
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
             filter_feeds();
-            listbox_items.UpdateLayout();
+            //listbox_items.UpdateLayout();
         }
 
         public void button_show_all_Click(object sender, RoutedEventArgs e)
@@ -589,7 +635,13 @@ namespace Menere.UserInterface
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
             filter_feeds();
-            listbox_items.UpdateLayout();
+            //listbox_items.UpdateLayout();
+        }
+
+        private void button_prefernces_Click(object sender, RoutedEventArgs e)
+        {
+            UserInterface.Preferences preferences = new Preferences();
+            preferences.Show();
         }
 
         

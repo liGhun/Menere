@@ -21,10 +21,13 @@
     <!-- Icons -->
 
     <ImageSource x:Key="button_mark_item_read">/Menere;component/Images/ButtonsDark/glyphicons_198_ok.png</ImageSource>
+    <ImageSource x:Key="button_mark_item_unread">/Menere;component/Images/ButtonsDark/glyphicons_198_ok_green.png</ImageSource>
     <ImageSource x:Key="button_save_item">/Menere;component/Images/ButtonsDark/glyphicons_072_bookmark.png</ImageSource>
+    <ImageSource x:Key="button_saved_item">/Menere;component/Images/ButtonsDark/glyphicons_072_bookmark_saved.png</ImageSource>
     <ImageSource x:Key="button_open_webbrowser">/Menere;component/Images/ButtonsDark/glyphicons_370_globe_af.png</ImageSource>
     <ImageSource x:Key="button_remove_filter">/Menere;component/Images/ButtonsDark/glyphicons_256_delete.png</ImageSource>
     <ImageSource x:Key="button_refresh">/Menere;component/Images/ButtonsDark/glyphicons_081_refresh.png</ImageSource>
+    <ImageSource x:Key="button_preferences">/Menere;component/Images/ButtonsDark/glyphicons_280_settings.png</ImageSource>
     <ImageSource x:Key="button_add_account">/Menere;component/Images/ButtonsDark/glyphicons_006_user_add.png</ImageSource>
     <ImageSource x:Key="image_folder">/Menere;component/Images/ButtonsDark/glyphicons_144_folder_open.png</ImageSource>
 
@@ -43,7 +46,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="UIElement.Opacity" Value="0.4" />
+        <Setter Property="UIElement.Opacity" Value="0.5" />
         <Style.Triggers>
             <Trigger  Property="UIElement.IsMouseOver" Value="True">
                 <Setter Property="UIElement.Opacity" Value="1" />
@@ -72,6 +75,12 @@
 
 
     <Style TargetType="{x:Type Window}">
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=color_main_background}"></Setter>
+        <Setter Property="Foreground" Value="{DynamicResource ResourceKey=color_main_foreground}"></Setter>
+    </Style>
+
+
+    <Style TargetType="{x:Type UserControl}">
         <Setter Property="Background" Value="{DynamicResource ResourceKey=color_main_background}"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource ResourceKey=color_main_foreground}"></Setter>
     </Style>

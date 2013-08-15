@@ -28,8 +28,8 @@
     <SupportUrl>http://www.li-ghun.de/</SupportUrl>
     <ProductName>Meneré</ProductName>
     <PublisherName>lI%27 Ghun %28Sven Walther%29</PublisherName>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>0.7.0.%2a</ApplicationVersion>
+    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationVersion>0.7.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -73,8 +73,9 @@
     <Reference Include="AppNetDotNet">
       <HintPath>..\packages\AppNet.NET.1.6.3.11\lib\net40-full\AppNetDotNet.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.5.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="ReachFramework" />
@@ -125,11 +126,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="UserInterface\Preferences.xaml.cs">
+      <DependentUpon>Preferences.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\AccountListboxForAdding.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\ConfigureProxy.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\EditItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,6 +165,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserInterface\Debug.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterface\EditItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserInterface\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +188,9 @@
     <Compile Include="Controls\ConfigureProxy.xaml.cs">
       <DependentUpon>ConfigureProxy.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\EditItem.xaml.cs">
+      <DependentUpon>EditItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\FeedBox.xaml.cs">
       <DependentUpon>FeedBox.xaml</DependentUpon>
     </Compile>
@@ -183,6 +202,8 @@
     </Compile>
     <Compile Include="Converters\Base64ImageConverter.cs" />
     <Compile Include="Converters\ItemWidthConverter.cs" />
+    <Compile Include="ExternalServices\AppDotNet.cs" />
+    <Compile Include="ExternalServices\IExternalService.cs" />
     <Compile Include="Helper\Crypto.cs" />
     <Compile Include="Helper\Images.cs" />
     <Compile Include="Model\CommaFeedAccount.cs" />
@@ -194,6 +215,7 @@
     <Compile Include="Model\FeverFeed.cs" />
     <Compile Include="Model\FeverFolder.cs" />
     <Compile Include="Model\IFolder.cs" />
+    <Compile Include="Model\MenereDebug.cs" />
     <Compile Include="Model\TinyTinyAccount.cs" />
     <Compile Include="Snarl\Snarl.cs" />
     <Compile Include="UserInterface\AccountSpecific\AccountTypeNotAvailable.xaml.cs">
@@ -205,11 +227,21 @@
     <Compile Include="UserInterface\Add Account.xaml.cs">
       <DependentUpon>Add Account.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserInterface\Debug.xaml.cs">
+      <DependentUpon>Debug.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserInterface\EditItem.xaml.cs">
+      <DependentUpon>EditItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserInterface\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Themes\Default Light.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserInterface\Preferences.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -249,6 +281,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\liGhun.ShareSharp\ShareSharp.csproj">
+      <Project>{a28a4637-3731-4a45-adac-60092376fd00}</Project>
+      <Name>ShareSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RSSharp\RSSharp.csproj">
       <Project>{2019528e-46c3-4fcb-aaf0-75bea2295435}</Project>
       <Name>RSSharp</Name>
@@ -723,6 +759,12 @@
     <Resource Include="Images\ButtonsDark\glyphicons_419_e-mail.png" />
     <Resource Include="Images\ButtonsDark\quote.png" />
     <Resource Include="Images\ButtonsDark\resize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ButtonsDark\glyphicons_072_bookmark_saved.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ButtonsDark\glyphicons_198_ok_green.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

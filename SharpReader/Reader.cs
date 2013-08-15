@@ -55,8 +55,12 @@ namespace ReaderSharp
 
             try
             {
-                authToken = new Regex(@"Auth=(?<authToken>\S+)").Match(response).Result("${authToken}");
-                Properties.Settings.Default.authToken = authToken.Trim();
+
+                Match match = new Regex(@"Auth=(?<authToken>\S+)").Match(response);
+                if(match.Success) {
+                    authToken = match.Result("${authToken}");
+                    Properties.Settings.Default.authToken = authToken.Trim();
+                }
             }
             catch (Exception e)
             {

@@ -109,7 +109,29 @@ namespace Menere.Model
 
         public void mark_all_items_read()
         {
-            return;
+            FeedlyAccount account = this.receiving_account as FeedlyAccount;
+            if(account != null) {
+                RSSharp.Feedly.ApiCalls.Markers.mark_feed_as_read(account.token.access_token, this.feedly_feed.id);
+                try
+                {
+                    IEnumerable<IItem> unread_items = account.unread_items.Where(item => item.feed_id == this.feedly_feed.id);
+                    if (unread_items != null)
+                    {
+                        List<IItem> items = new List<IItem>();
+                        foreach (IItem item in unread_items)
+                        {
+                            items.Add(item);
+                        }
+                        foreach (IItem item in items)
+                        {
+                            item.is_read = true;
+                            account.unread_items.Remove(item);
+                        }
+                        items = null;
+                    }
+                }
+                catch { }
+            }
         }
 
         public override string ToString()

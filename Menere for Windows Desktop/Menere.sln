@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpFever", "SharpFever\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSSharp", "RSSharp\RSSharp.csproj", "{2019528E-46C3-4FCB-AAF0-75BEA2295435}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareSharp", "liGhun.ShareSharp\ShareSharp.csproj", "{A28A4637-3731-4A45-ADAC-60092376FD00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{2019528E-46C3-4FCB-AAF0-75BEA2295435}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2019528E-46C3-4FCB-AAF0-75BEA2295435}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2019528E-46C3-4FCB-AAF0-75BEA2295435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A28A4637-3731-4A45-ADAC-60092376FD00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28A4637-3731-4A45-ADAC-60092376FD00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28A4637-3731-4A45-ADAC-60092376FD00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28A4637-3731-4A45-ADAC-60092376FD00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

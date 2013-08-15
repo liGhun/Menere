@@ -264,7 +264,14 @@ namespace Menere.Model
                             unread_items.Add(unread_item);
                             if (initial_fetch_completed)
                             {
-                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title,  icon:unread_item.feed.icon_path);
+                                try
+                                {
+                                    AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title, icon: unread_item.feed.icon_path);
+                                }
+                                catch (Exception exp)
+                                {
+                                    AppController.add_debug_message(exp);
+                                }
                             }
                         }
                         break;
@@ -274,6 +281,14 @@ namespace Menere.Model
                         if (saved_item != null)
                         {
                             saved_items.Add(saved_item);
+                        }
+                        break;
+
+                    case 99:
+                        uint? last_updated = e.UserState as uint?;
+                        if (last_updated != null)
+                        {
+                            this.fever_account.last_refreshed_on_time = last_updated.Value;
                         }
                         break;
 

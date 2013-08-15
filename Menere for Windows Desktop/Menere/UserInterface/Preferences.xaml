@@ -1,0 +1,45 @@
+﻿<Window x:Class="Menere.UserInterface.Preferences"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Preferences" Height="472.704" Width="713.52">
+    <Grid>
+        <TabControl Name="tabControl_preferencs_main">
+            <TabItem Name="tabItem_accounts" Header="Accounts">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Name="listbox_accounts" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0"/>
+                    <StackPanel Name="stackpanel_account_buttons" Orientation="Vertical" Grid.Column="1">
+                        
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Name="tabItem_layout" Header="Layout">
+
+            </TabItem>
+
+            <TabItem Name="tabItem_external_services" Header="Services">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListBox Name="listbox_external_services" Grid.Column="0" />
+                    <StackPanel Name="stackpanel_services_buttons" Orientation="Vertical" Grid.Column="1">
+                        <Button Name="button_add_app_net" Content="+ App.net" Click="button_add_app_net_Click"/>
+                        <Button Name="button_remove_account" Content="Delete"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Name="tabItem_about" Header="About">
+                <TextBlock Name="textblock_about" Text="Meneré for Windows Desktop by Dog Food Soft"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

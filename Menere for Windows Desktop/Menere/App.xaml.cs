@@ -15,7 +15,31 @@ namespace Menere
     {
         public void Application_Startup(object sender, StartupEventArgs e)
         {
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             AppController.Start();
+        }
+
+        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                AppController.add_debug_message("CurrentDomain Exception");
+            }
+            catch { }
+
+        }
+
+        void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                AppController.add_debug_message(e.Exception);
+            }
+            catch { }
+
+            e.Handled = true;
         }
     }
 }

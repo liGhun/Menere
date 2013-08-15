@@ -30,7 +30,7 @@ namespace Menere.Controls
         {
             try
             {
-                IFeed feed = this.DataContext as IFeed;
+                IFeed feed = grid_feed.DataContext as IFeed;
                 if (feed != null)
                 {
 
@@ -48,5 +48,15 @@ namespace Menere.Controls
                 BitmapImage image = new BitmapImage(new Uri("/Menere;component/Images/MenereIcon.ico", UriKind.Relative));
                 image_favicon.Source = image;
             }
-        }    }
+        }
+
+        private void button_mark_read_Click(object sender, RoutedEventArgs e)
+        {
+            IFeed feed = grid_feed.DataContext as IFeed;
+            if (feed != null)
+            {
+                feed.mark_all_items_read();
+            }
+        }
+    }
 }

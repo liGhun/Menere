@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Threading;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -24,6 +25,66 @@ namespace Menere.Controls
         public ItemBox()
         {
             InitializeComponent();
+
+            if (AppController.active_external_services.Count > 0)
+            {
+                MenuItem menu_send_to = new MenuItem();
+                menu_send_to.Header = "Send to...";
+
+                foreach (ShareSharp.IShareService service in AppController.active_external_services)
+                {
+
+                    MenuItem menu_item_service = new MenuItem();
+                    menu_item_service.Header = service.Name;
+                    menu_item_service.PreviewMouseDown += menu_item_service_PreviewMouseDown;
+                    menu_item_service.Click += menu_item_service_Click;
+                    menu_item_service.CommandParameter = service;
+                    menu_send_to.Items.Add(service);
+                }
+
+                border_around_item.ContextMenu.Items.Add(menu_send_to);
+            }
+        }
+
+        void menu_item_service_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MenuItem menu_item = sender as MenuItem;
+            if (menu_item != null)
+            {
+                IItem item = this.DataContext as IItem;
+                ShareSharp.IShareService service = menu_item.CommandParameter as ShareSharp.IShareService;
+                if (item != null && service != null)
+                {
+                    string text = item.html;
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        text = "";
+                    }
+                    text = System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
+                    service.SendNow(item.title, text, item.url);
+                }
+            }
+        }
+
+        void menu_item_service_Click(object sender, RoutedEventArgs e)
+        {
+
+            MenuItem menu_item = sender as MenuItem;
+            if (menu_item != null)
+            {
+                IItem item = this.DataContext as IItem;
+                ShareSharp.IShareService service = menu_item.CommandParameter as ShareSharp.IShareService;
+                if (item != null && service != null)
+                {
+                    string text = item.html;
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        text = "";
+                    }
+                    text = System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
+                    service.SendNow(item.title, text, item.url);
+                }
+            }
         }
 
         private void button_mark_read_Click(object sender, RoutedEventArgs e)
@@ -34,23 +95,30 @@ namespace Menere.Controls
                  IItem item = button.DataContext as IItem;
                  if (item != null)
                  {
-                     if (!item.is_read)
-                     {
-                         if (item.mark_read())
-                         {
-                             item.receiving_account.unread_items.Remove(item);
-                             item.is_read = true;
-                         }
-                     }
-                     else
-                     {
-                         if (item.mark_unread())
-                         {
-                             item.receiving_account.unread_items.Add(item);
+                    if (!item.is_read)
+                        {
+                            ThreadPool.QueueUserWorkItem(delegate
+                            {
+                                item.mark_read();
+                            });
+                            item.is_read = true;
+                            try {
+                                item.receiving_account.unread_items.Remove(item);
+                            } catch {}
+                        }
+                        else
+                        {
+                            ThreadPool.QueueUserWorkItem(delegate
+                             {
+                                item.mark_unread();
+                             });
                              item.is_read = false;
-                         }
-                     }
-
+                             try
+                             {
+                                 item.receiving_account.unread_items.Add(item);
+                             }
+                             catch { }
+                        }
                  }
              }
         }
@@ -117,21 +185,39 @@ namespace Menere.Controls
                 {
                     if (!item.is_saved)
                     {
-                        if (item.mark_saved())
+                        ThreadPool.QueueUserWorkItem(delegate
+                         {
+                             item.mark_saved();
+                         });
+                        try
                         {
                             item.receiving_account.saved_items.Add(item);
                         }
+                        catch { }
                     }
                     else
                     {
-                        if (item.mark_unsaved())
+                        ThreadPool.QueueUserWorkItem(delegate
+                         {
+                             item.mark_unsaved();
+                         });
+                        try
                         {
                             item.receiving_account.saved_items.Remove(item);
                         }
+                        catch { }
                     }
 
                 }
             }
+        }
+
+        private void contextMenu_edit_tags_Click(object sender, RoutedEventArgs e)
+        {
+            UserInterface.EditItem edit_item = new UserInterface.EditItem();
+            edit_item.DataContext = this.DataContext;
+            edit_item.ShowInTaskbar = true;
+            edit_item.Show();
         }
 
   

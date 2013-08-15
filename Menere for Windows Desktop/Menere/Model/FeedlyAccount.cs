@@ -41,6 +41,25 @@ namespace Menere.Model
             {
                 switch (e.ProgressPercentage)
                 {
+                    case 1:
+                        Exception exp = e.UserState as Exception;
+                        if (exp != null)
+                        {
+                            AppController.add_debug_message(exp);
+                        }
+                        break;
+
+                    case 2:
+                        KeyValuePair<string, string>? debug = e.UserState as KeyValuePair<string, string>?;
+                        if (debug != null)
+                        {
+                            if (debug.HasValue)
+                            {
+                                AppController.add_debug_message(debug.Value.Key, debug.Value.Value);
+                            }
+                        }
+                        break;
+
                     case 10:
                         FeedlyFeed feed = e.UserState as FeedlyFeed;
                         if (feed != null)
@@ -65,7 +84,15 @@ namespace Menere.Model
                             unread_items.Add(unread_item);
                             if (initial_fetch_completed)
                             {
-                                AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title, icon:unread_item.feed.icon_path);
+                                try
+                                {
+                                    AppController.Current.snarl_interface.Notify(classId: "New unread item", title: unread_item.feed.title, text: unread_item.title, icon: unread_item.feed.icon_path);
+                                }
+
+                                catch (Exception expSnarl)
+                                {
+                                    AppController.add_debug_message(expSnarl);
+                                }
                             }
                         }
                         break;
@@ -113,11 +140,17 @@ namespace Menere.Model
             {
                 fetched_feeds.Add(feed.id, feed);
             }
+
+            KeyValuePair<string, string>? debug = new KeyValuePair<string, string>?();
+
             try
             {
                 if (!first_fetch_completed)
                 {
                     // fetching saved items first
+                    debug = new KeyValuePair<string, string>("Starting inital fetch of saved items", "");
+                    backgroundWorker_update_entries.ReportProgress(2, debug);
+
                     Streams.entries_list saved_entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/tag/global.saved", this.profile.id), count: 1000);
                     foreach (Entry entry in saved_entries.items)
                     {
@@ -156,6 +189,8 @@ namespace Menere.Model
                     }
 
                     // now we are getting the unread ones
+                    debug = new KeyValuePair<string, string>("Starting inital fetch of unread items", "");
+                    backgroundWorker_update_entries.ReportProgress(2, debug);
                     Streams.entries_list unread_entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 1000, unread_only: true);
                     foreach (Entry entry in unread_entries.items)
                     {
@@ -206,16 +241,23 @@ namespace Menere.Model
                             }
                         }
                     }
-                    
 
+                    debug = new KeyValuePair<string, string>("Starting inital fetch of items in feeeds", "");
+                    backgroundWorker_update_entries.ReportProgress(2, debug);
                     // finally we go through feeds for more items
                     foreach (FeedlyFeed feed in fetched_feeds.Values)
                     {
+                        debug = new KeyValuePair<string, string>("Fetching items of feed", feed.title);
+                        backgroundWorker_update_entries.ReportProgress(2, debug);
                         Streams.entries_list feed_entries = Streams.get_entries_in_stream(this.token.access_token, feed.id, count: 100);
                         foreach (Entry entry in feed_entries.items)
                         {
+                            debug = new KeyValuePair<string, string>("Fetched entry in feed " + feed.title, entry.title);
+                            backgroundWorker_update_entries.ReportProgress(2, debug);
                             if (known_items.ContainsKey(entry.id))
                             {
+                                debug = new KeyValuePair<string, string>("Fetched entry already known in feed " + feed.title + " - SKIPPING", entry.title);
+                                backgroundWorker_update_entries.ReportProgress(2, debug);
                                 continue;
                             }
 
@@ -247,21 +289,32 @@ namespace Menere.Model
                             }
 
                         }
-                        if (feed_entries.updated > this.newer_than || newer_than == null)
-                        {
-                            backgroundWorker_update_entries.ReportProgress(100, feed_entries.updated);
-                        }
+                        
                     }
                 }
                 else
                 {
                     try
                     {
-                        Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 100, newer_than: newer_than);
+                        long? start_date = newer_than;
+                        if(start_date == null) {
+                            start_date = 0;
+                        }
+                        long ticks = Convert.ToInt64(start_date / 1000);
+                        System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                        dtDateTime = dtDateTime.AddSeconds(ticks);
+                        dtDateTime = dtDateTime.ToLocalTime();
+                        debug = new KeyValuePair<string, string>("*** Fetching now new entries", string.Format("Since timestamp {0} which is {1} at {2}", newer_than, dtDateTime.ToLongDateString(), dtDateTime.ToLongTimeString()));
+                        backgroundWorker_update_entries.ReportProgress(2, debug);
+                        Streams.entries_list entries = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 100, newer_than: newer_than, ranked:"newest");
                         foreach (Entry entry in entries.items)
                         {
+                            debug = new KeyValuePair<string, string>("Fetched new entry " + entry.title, "Timestamp is " + entry.crawled);
+                            backgroundWorker_update_entries.ReportProgress(2, debug);
                             if (known_items.ContainsKey(entry.id))
                             {
+                                debug = new KeyValuePair<string, string>("Fetched entry already known - SKIPPING", entry.title);
+                                backgroundWorker_update_entries.ReportProgress(2, debug);
                                 continue;
                             }
 
@@ -288,27 +341,54 @@ namespace Menere.Model
 
                             if (feed_of_entry != null)
                             {
+                                debug = new KeyValuePair<string, string>("Entry has valid feed", feed_of_entry.title);
+                                backgroundWorker_update_entries.ReportProgress(2, debug);
                                 FeedlyItem item = new FeedlyItem(this, feed_of_entry, entry);
                                 backgroundWorker_update_entries.ReportProgress(90, item);
                                 known_items.Add(item.id, item);
+
+                                if (!item.is_read)
+                                {
+                                    debug = new KeyValuePair<string, string>("Entry is unread", "");
+                                    backgroundWorker_update_entries.ReportProgress(2, debug);
+                                    backgroundWorker_update_entries.ReportProgress(91, item);
+                                }
+
+                                if (entry.tags != null)
+                                {
+                                    IEnumerable<Tag> tags_saved = entry.tags.Where(t => t.id == string.Format("user/{0}/tag/global.saved", this.profile.id));
+                                    if (tags_saved != null)
+                                    {
+                                        if (tags_saved.Count() > 0)
+                                        {
+                                            debug = new KeyValuePair<string, string>("Entry is saved", "");
+                                            backgroundWorker_update_entries.ReportProgress(2, debug);
+                                            item.is_saved = true;
+                                            backgroundWorker_update_entries.ReportProgress(92, item);
+                                        }
+                                    }
+                                }
                             }
 
-                            if (entries.updated > this.newer_than || newer_than == null)
-                            {
-                                backgroundWorker_update_entries.ReportProgress(100, entries.updated);
-                            }
                         }
                     }
                     catch (Exception exp)
                     {
-                        Console.WriteLine(exp.Message);
+                        backgroundWorker_update_entries.ReportProgress(1, exp);
                     }
                 }
             }
             catch (Exception exp)
             {
-                Console.WriteLine(exp.Message);
+                backgroundWorker_update_entries.ReportProgress(1, exp);
             }
+
+            if (known_items.Count > 0)
+            {
+                long highest_known_timestamp = known_items.Values.Max(item => item.feedly_entry.crawled) + 1;
+                backgroundWorker_update_entries.ReportProgress(100, highest_known_timestamp);
+            }
+
 
             fetched_feeds = null;
             known_items = null;
@@ -440,10 +520,10 @@ namespace Menere.Model
                         {
                             foreach (Category category in categories_in_subscription[feed.id])
                             {
-                                List<IFolder> cat_of_feed = groups.Where(g => g.name == category.label) as List<IFolder>;
+                                IEnumerable<IFolder> cat_of_feed = groups.Where(g => g.name == category.label);
                                 if (cat_of_feed != null)
                                 {
-                                    if (cat_of_feed.Count > 0)
+                                    if (cat_of_feed.Count() > 0)
                                     {
                                         FeedlyFolder folder = cat_of_feed.First() as FeedlyFolder;
                                         folder.feeds.Add(feedly_feed);

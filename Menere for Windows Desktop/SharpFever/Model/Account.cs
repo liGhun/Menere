@@ -166,6 +166,11 @@ namespace SharpFever.Model
             parameters.Add("as","read");
             parameters.Add("id", id.ToString());
             FeverResponse response = get_general_request("", parameters);
+            if (response == null)
+            {
+                response = new FeverResponse();
+                response.auth = false;
+            }
             return response.auth;
         }
 

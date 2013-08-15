@@ -1,0 +1,9 @@
+﻿<Window x:Class="Menere.UserInterface.Debug"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Debug" Height="600" Width="950">
+    <Grid>
+        <ListView Name="listview_debug" Margin="0,0,0,37" />
+        <Button Content="Copy to clipboard" Name="button_copy_to_clipboard" Click="button_copy_to_clipboard_Click" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="123"/>
+    </Grid>
+</Window>

@@ -117,13 +117,20 @@
                 Name="button_refresh" ToolTip="Refresh" HorizontalAlignment="Right" VerticalAlignment="Top" Click="button_refresh_Click">
                 <Image Name="image_refresh" Source="{DynamicResource button_refresh}"/>
             </Button>
-            <Button Name="button_add_account" Grid.Column="1" 
+            <Button Name="button_prefernces" Grid.Column="1" 
+                MaxWidth="20" MaxHeight="20"
+                    Margin="6,0,6,0"
+                Style="{DynamicResource ResourceKey=button_without_border}"
+                ToolTip="Preferences" Click="button_prefernces_Click" >
+                <Image Name="image_preferences" Source="{DynamicResource button_preferences}"/>
+            </Button>
+            <!-- <Button Name="button_add_account" Grid.Column="1" 
                 MaxWidth="20" MaxHeight="20"
                     Margin="6,0,6,0"
                 Style="{DynamicResource ResourceKey=button_without_border}"
                 ToolTip="Add another account" Click="button_add_account_Click">
                 <Image Name="image_add_account" Source="{DynamicResource button_add_account}"/>
-            </Button>
+            </Button> -->
             <ComboBox Margin="6,0,6,0" Grid.Column="1"  Name="combobox_accounts" HorizontalAlignment="Right"  VerticalAlignment="Top" Width="104" SelectionChanged="combobox_accounts_SelectionChanged"/>
         </VirtualizingStackPanel>
 

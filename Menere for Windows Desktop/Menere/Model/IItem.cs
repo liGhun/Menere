@@ -25,5 +25,6 @@ namespace Menere.Model
         bool mark_unread();
         bool mark_saved();
         bool mark_unsaved();
+        void save_tags(string tag_string);
     }
 }

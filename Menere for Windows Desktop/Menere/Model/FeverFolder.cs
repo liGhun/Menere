@@ -31,16 +31,24 @@ namespace Menere.Model
         {
             get
             {
-                IEnumerable<IFeed> the_feeds = all_feeds.Where(feed => this.fever_feeds_group.feed_ids_list.Contains(Convert.ToUInt32(feed.id)));
-                ObservableCollection<IFeed> return_value = new ObservableCollection<IFeed>();
-                if (the_feeds != null)
+                try
                 {
-                    foreach (IFeed feed in the_feeds)
+                    IEnumerable<IFeed> the_feeds = all_feeds.Where(feed => this.fever_feeds_group.feed_ids_list.Contains(Convert.ToUInt32(feed.id)));
+                    ObservableCollection<IFeed> return_value = new ObservableCollection<IFeed>();
+                    if (the_feeds != null)
                     {
-                        return_value.Add(feed);
+                        foreach (IFeed feed in the_feeds)
+                        {
+                            return_value.Add(feed);
+                        }
                     }
+                    return return_value;
                 }
-                return return_value;
+                catch (Exception exp)
+                {
+                    AppController.add_debug_message(exp);
+                    return new System.Collections.ObjectModel.ObservableCollection<IFeed>();
+                }
             }
 
             set { }

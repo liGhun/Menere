@@ -128,21 +128,37 @@ namespace Menere.Model
 
         public void mark_all_items_read()
         {
-        /*    SharpFever.Model.FeverResponse unread_items_ids = receiving_account.get_unread_item_ids();
-            if (unread_items_ids != null)
+            FeverAccount account = this.receiving_account as FeverAccount;
+            if (account != null)
             {
-                if (unread_items_ids.unread_item_ids_list != null && !string.IsNullOrEmpty(unread_items_ids.unread_item_ids))
+                try
                 {
-                    SharpFever.Model.FeverResponse unread_fever_items = receiving_account.get_items(with_ids: unread_items_ids.unread_item_ids_list);
-                    foreach (SharpFever.Model.Item fever_item in unread_fever_items.items)
+                    IEnumerable<IItem> unread_items = account.unread_items.Where(item => item.feed_id == this.id);
+                    if (unread_items != null)
                     {
-                        Model.FeverItem item = new Model.FeverItem(fever_item);
-                        item.receiving_account = account;
-                        unread_items.Add(new Model.FeverItem(fever_item));
+                        List<FeverItem> items = new List<FeverItem>();
+                        foreach (IItem item in unread_items)
+                        {
+                            FeverItem fever_item = item as FeverItem;
+                            if (fever_item != null)
+                            {
+                                items.Add(fever_item);
+                            }
+                        }
+
+                       
+                        account.fever_account.mark_feed_as_read(this.fever_feed);
+                        
+                        foreach (FeverItem item in items)
+                        {
+                            item.is_read = true;
+                            account.unread_items.Remove(item);
+                        }
+                        items = null;
                     }
-                    listbox_items.ItemsSource = unread_items;
                 }
-            } */
+                catch { }
+            }
         }
 
 

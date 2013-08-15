@@ -5,13 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid Name="grid_feed" DataContext="{Binding}">
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Name="contextMenu_mark_feed_read" Header="Mark feed as read" Click="button_mark_read_Click"></MenuItem>
+            </ContextMenu>
+        </Grid.ContextMenu>
         <VirtualizingStackPanel Orientation="Horizontal">
+            <VirtualizingStackPanel Width="16" Name="stackpanel_buttons" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <VirtualizingStackPanel.Style>
+                    <Style TargetType="VirtualizingStackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <Trigger  Property="Image.IsMouseOver" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </VirtualizingStackPanel.Style>
+                <Button Name="button_mark_read" ToolTip="Mark as read" Click="button_mark_read_Click" Width="12" Height="12" Margin="0,0,4,0" Style="{DynamicResource ResourceKey=button_without_border}">
+                    <Image Name="image_button_mark_feed_read" Source="{DynamicResource button_mark_item_read}" />
+                </Button>
+            </VirtualizingStackPanel>
             <Image Name="image_favicon" Source="{Binding Path=icon_path}"  Margin="0,0,5,0" Height="12" ImageFailed="image_favicon_ImageFailed" />
             <TextBlock Name="textblock_title" Text="{Binding Path=title}"
                        Background="Transparent" 
                        Foreground="{DynamicResource ResourceKey=color_main_foreground}"
                        ToolTip="{Binding Path=title}" />
         </VirtualizingStackPanel>
+        
     </Grid>
 </UserControl>

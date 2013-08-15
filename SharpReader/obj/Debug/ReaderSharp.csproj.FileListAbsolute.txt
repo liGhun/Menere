@@ -15,3 +15,9 @@ C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp
 C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.csproj.GenerateResource.Cache
 C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.dll
 C:\Users\WaltherS\Documents\Development\Menere\SharpReader\obj\Debug\ReaderSharp.pdb
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.dll.config
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.dll
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\ReaderSharp.pdb
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.dll
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\WaltherS\Documents\Development\Menere\SharpReader\bin\Debug\Newtonsoft.Json.xml

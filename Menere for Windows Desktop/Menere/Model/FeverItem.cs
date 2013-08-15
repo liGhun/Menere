@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Menere.Model
 {
-    public class FeverItem : IItem
+    public class FeverItem : IItem, INotifyPropertyChanged
     {
         public SharpFever.Model.Item fever_item;
 
@@ -104,6 +105,7 @@ namespace Menere.Model
             set
             {
                 fever_item.is_read = value;
+                NotifyPropertyChanged("is_read");
             }
         }
 
@@ -116,6 +118,7 @@ namespace Menere.Model
             set
             {
                 fever_item.is_saved = value;
+                NotifyPropertyChanged("is_saved");
             }
         }
 
@@ -196,5 +199,23 @@ namespace Menere.Model
                 return "";
             }
         }
+
+
+        public void save_tags(string tag_string)
+        {
+            return;
+        }
+
+        #region Property changed
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string property_name = "")
+        {
+            if (PropertyChanged != null && !string.IsNullOrEmpty(property_name))
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property_name));
+            }
+        }
+        #endregion
     }
 }

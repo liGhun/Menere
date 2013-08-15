@@ -20,7 +20,12 @@ namespace Menere
         private bool all_accounts_read { get; set; }
         public static ObservableCollection<IAccount> available_account_types { get; set; }
         public static ObservableCollection<IAccount> accounts { get; set; }
+        public static ObservableCollection<MenereDebug> debug { get; set; }
+        public static bool debug_enabled { get; set; }
         public Snarl.SnarlInterface snarl_interface;
+
+        public static ObservableCollection<ShareSharp.IShareService> available_external_services { get; set; }
+        public static ObservableCollection<ShareSharp.IShareService> active_external_services { get; set; }
 
         public Model.IAccount current_account
         {
@@ -31,13 +36,23 @@ namespace Menere
         private AppController()
         {           
             Current = this;
+
+            RSSharp.Common.HTTPCommunications.user_agent = "Menere " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
             app_data_path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\liGhun\\Menere\\";
             themes_path = app_data_path + "Themes\\";
 
+            debug = new ObservableCollection<MenereDebug>();
+            if(System.IO.File.Exists("C:\\debug.menere")) {
+                debug_enabled = true;
+                UserInterface.Debug debug_window = new Debug();
+                debug_window.Show();
 
-
+            }
+            
             System.Windows.FrameworkElement.LanguageProperty.OverrideMetadata(typeof(System.Windows.FrameworkElement),
                 new System.Windows.FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
+
 
             available_account_types = new ObservableCollection<IAccount>();
             available_account_types.Add(new Model.FeverAccount());
@@ -64,6 +79,12 @@ namespace Menere
             app_program_path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
 
             AppNetDotNet.Model.Authorization.registerAppInRegistry(AppNetDotNet.Model.Authorization.registerBrowserEmulationValue.IE9Always);
+
+            available_external_services = new ObservableCollection<ShareSharp.IShareService>();
+            available_external_services.Add(new ShareSharp.AppNet());
+
+            active_external_services = new ObservableCollection<ShareSharp.IShareService>();
+
 
             try
             {
@@ -221,6 +242,20 @@ namespace Menere
         public void update_filter()
         {
             main_window.update_all_filter();
+        }
+
+        public static void add_debug_message(Exception exp = null)
+        {
+            if (debug_enabled)
+            {
+                debug.Add(new MenereDebug(exp.Message, text: exp.StackTrace, exp: exp));
+            }
+        }
+
+        public static void add_debug_message(string title, string text = null) {
+            if(debug_enabled) {
+                debug.Add(new MenereDebug(title, text: text));
+            }
         }
     }
 }

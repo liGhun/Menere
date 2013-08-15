@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RSSharp.Feedly.Model;
+using System.ComponentModel;
 
 namespace Menere.Model
 {
-    class FeedlyItem : IItem
+    class FeedlyItem : IItem, INotifyPropertyChanged
     {
         public Entry feedly_entry { get; set; }
 
@@ -17,7 +18,6 @@ namespace Menere.Model
             this.feed_id = feed_id;
             this.receiving_account = account;
             this.feed = feed;
-            is_read = true;
         }
 
         public string id
@@ -134,14 +134,24 @@ namespace Menere.Model
             set
             {
                 feedly_entry.unread = !value;
+                NotifyPropertyChanged("is_read");
             }
         }
 
         public bool is_saved
         {
-            get;
-            set;
+            get
+            {
+                return _is_saved;
+            }
+            set
+            {
+                _is_saved = value;
+                NotifyPropertyChanged("is_saved");
+            }
         }
+
+        private bool _is_saved { get; set; }
 
         public DateTime created
         {
@@ -243,5 +253,98 @@ namespace Menere.Model
                 return "";
             }
         }
+
+
+        public void save_tags(string tag_string)
+        {
+            FeedlyAccount account = this.receiving_account as FeedlyAccount;
+            if(account == null) {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(tag_string))
+            {
+                if (this.feedly_entry.tags != null)
+                {
+                    List<string> tag_ids = new List<string>();
+                    foreach (Tag tag in this.feedly_entry.tags)
+                    {
+                        tag_ids.Add(tag.id);
+                    }
+                    RSSharp.Feedly.ApiCalls.Tags.delete_multiple(account.token.access_token, tag_ids);
+                    this.feedly_entry.tags.Clear();
+                }
+            }
+            else
+            {
+                string[] tag_labels = tag_string.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                if (this.feedly_entry.tags == null)
+                {
+                    this.feedly_entry.tags = new List<Tag>();
+                }
+
+                List<string> to_be_added_tags = new List<string>();
+                List<string> to_be_removed_tag_ids = new List<string>();
+                foreach (Tag tag in this.feedly_entry.tags)
+                {
+                    if (tag_labels.Contains(tag.label))
+                    {
+                        // already existing tag - do nothing
+                        continue;
+                    }
+                    else
+                    {
+                        to_be_removed_tag_ids.Add(tag.id);
+                    }
+                }
+
+                foreach (string tag in tag_labels)
+                {
+                    IEnumerable<Tag> matches = feedly_entry.tags.Where(t => t.label == tag);
+                    if (matches == null)
+                    {
+                        to_be_added_tags.Add(tag);
+                    }
+                    else
+                    {
+                        if (matches.Count() == 0)
+                        {
+                            to_be_added_tags.Add(tag);
+                        }
+                    }
+                }
+
+                if (to_be_removed_tag_ids.Count > 0)
+                {
+                    RSSharp.Feedly.ApiCalls.Tags.delete_multiple(account.token.access_token, to_be_removed_tag_ids);
+                }
+
+                if (to_be_added_tags.Count() > 0)
+                {
+                    List<string> tag_ids = new List<string>();
+                    foreach (string label in to_be_added_tags)
+                    {
+                        tag_ids.Add(RSSharp.Feedly.Model.Tag.get_tag_id_for_label(label, account.profile.id));
+                    }
+                    RSSharp.Feedly.ApiCalls.Tags.add_multiple_to_entry(account.token.access_token, this.feedly_entry.id, tag_ids);
+                }
+
+                Entry changed_item = RSSharp.Feedly.ApiCalls.Entries.get(account.token.access_token, feedly_entry.id);
+                this.feedly_entry.tags = changed_item.tags;
+
+            }
+        }
+
+        #region Property changed
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string property_name = "")
+        {
+            if (PropertyChanged != null && !string.IsNullOrEmpty(property_name))
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property_name));
+            }
+        }
+        #endregion
     }
 }
