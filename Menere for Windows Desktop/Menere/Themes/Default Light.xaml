@@ -30,6 +30,8 @@
     <ImageSource x:Key="button_preferences">/Menere;component/Images/ButtonsDark/glyphicons_280_settings.png</ImageSource>
     <ImageSource x:Key="button_add_account">/Menere;component/Images/ButtonsDark/glyphicons_006_user_add.png</ImageSource>
     <ImageSource x:Key="image_folder">/Menere;component/Images/ButtonsDark/glyphicons_144_folder_open.png</ImageSource>
+    <ImageSource x:Key="image_tags">/Menere;component/Images/ButtonsDark/glyphicons_066_tags.png</ImageSource>
+    <ImageSource x:Key="image_share">/Menere;component/Images/ButtonsDark/glyphicons_222_share.png</ImageSource>
 
     <Style TargetType="Border" x:Key="theme_border_around_item">
         <Setter Property="CornerRadius" Value="0" />
@@ -71,6 +73,12 @@
     <Style TargetType="Grid" x:Key="theme_grid_around_item">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Margin" Value="4"/>
+    </Style>
+
+    <Style TargetType="GridSplitter">
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=color_main_foreground}" />
+        <Setter Property="Foreground" Value="{DynamicResource ResourceKey=color_main_foreground}"/>
+        <Setter Property="Opacity" Value="0.05"/>
     </Style>
 
 

@@ -1,6 +1,21 @@
 0.8
+Alternative item display as a list with single line entries
+ - needs less space
+ - can be sorted by any column
+Added item edit window (tags for now - more to come)
+Added send to menu - in this version we start with
+ - EMail
+ - App.net
+ - Pocket
 The save button now changes color when item is saved as well as showing the tooltip to remove saved state by pressing s
+The read button is now green on already read items
 The position and size of the window is saved and restored on next start
+You can change the height of top/bottom part of the window now (see more entries vs. see more content of the active entry)
+Removed add account button from main window and added it instead to the preferences window.
+Added remove account button to the preferences
+Removed the big tooltip on item and instead list all keyboard shortcuts in preferences window
+Added traditional setup as alternative to the Click Once installer
+Hiding script errors is back
 
 0.7.3
 Fix: possible crash on notification sending

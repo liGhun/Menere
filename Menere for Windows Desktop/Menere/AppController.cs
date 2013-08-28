@@ -16,13 +16,14 @@ namespace Menere
         public static string app_program_path { get; set; }
         public static string themes_path { get; set; }
         public MainWindow main_window;
-        private bool main_window_opened;
         private bool all_accounts_read { get; set; }
         public static ObservableCollection<IAccount> available_account_types { get; set; }
         public static ObservableCollection<IAccount> accounts { get; set; }
         public static ObservableCollection<MenereDebug> debug { get; set; }
         public static bool debug_enabled { get; set; }
         public Snarl.SnarlInterface snarl_interface;
+
+        private string encryption_salt = "uioz/()&/(%890%F7>F$)obl OBg6ibIO/(b I(b7b&5)bOPlB/)5G(O)";
 
         public static ObservableCollection<ShareSharp.IShareService> available_external_services { get; set; }
         public static ObservableCollection<ShareSharp.IShareService> active_external_services { get; set; }
@@ -147,7 +148,30 @@ namespace Menere
             }
 
             all_accounts_read = true;
-            
+
+            if (Properties.Settings.Default.share_services != null)
+            {
+                if (Properties.Settings.Default.share_services.Count > 0)
+                {
+                    foreach (string service_string in Properties.Settings.Default.share_services)
+                    {
+                        string[] service_data = service_string.Split(new string[] { "||||||||" }, StringSplitOptions.None);
+                        if (service_data.Count() == 2)
+                        {
+                            KeyValuePair<string, string> settings = new KeyValuePair<string, string>(service_data[0], service_data[1]);
+                            ShareSharp.IShareService service = ShareSharp.General.load_settings(settings, encryption_salt);
+                            if (service != null)
+                            {
+                                if (service.Verified)
+                                {
+                                    active_external_services.Add(service);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (accounts.Count == 0)
             {
                 Add_Account add_account = new Add_Account();
@@ -161,6 +185,7 @@ namespace Menere
         {
             snarl_interface.Unregister();
 
+            save_services();
         }
 
         private void save_accounts()
@@ -171,6 +196,20 @@ namespace Menere
                 string to_be_saved_string = to_be_saved_account.type + "||||||||" + Helper.Crypto.EncryptString(Helper.Crypto.ToSecureString(to_be_saved_account.get_settings()));
                 Properties.Settings.Default.accounts.Add(to_be_saved_string);
             }
+
+            Properties.Settings.Default.Save();
+        }
+
+        private void save_services()
+        {
+            Properties.Settings.Default.share_services = new System.Collections.Specialized.StringCollection();
+            foreach (ShareSharp.IShareService service in active_external_services)
+            {
+                KeyValuePair<string, string> service_settings = service.get_settings(encryption_salt);
+                string to_be_saved_service = service_settings.Key + "||||||||" + service_settings.Value;
+                Properties.Settings.Default.share_services.Add(to_be_saved_service);
+            }
+
             Properties.Settings.Default.Save();
         }
 
@@ -178,32 +217,47 @@ namespace Menere
         {
             if (main_window == null)
             {
-                this.current_account = accounts[0];
+                if (accounts.Count() > 0)
+                {
+                    this.current_account = accounts[0];
+                }
                 main_window = new MainWindow();
                 main_window.Closing += main_window_Closing;
+                toggle_listing();
             }
+            
             main_window.combobox_accounts.ItemsSource = accounts;
-            main_window.combobox_accounts.SelectedItem = accounts.Last();
-            main_window.button_show_unread_Click(null, null);
-            if (e.NewItems != null)
+            if (accounts.Count() > 0)
             {
-                foreach (IAccount added_account in e.NewItems)
+                main_window.combobox_accounts.SelectedItem = accounts.Last();
+                main_window.button_show_unread_Click(null, null);
+                if (e.NewItems != null)
                 {
-                    added_account.update_all_feeds();
+                    foreach (IAccount added_account in e.NewItems)
+                    {
+                        added_account.update_all_feeds();
+                    }
                 }
             }
-            if (!main_window_opened && accounts.Count > 0)
+            if (main_window != null && accounts.Count > 0)
             {
                 main_window.Show();
             }
             if (all_accounts_read)
             {
                 save_accounts();
-                main_window.button_refresh_Click(null, null);
+                if (accounts.Count() > 0)
+                {
+                    main_window.button_refresh_Click(null, null);
+                }
             }
             if (accounts.Count > 1)
             {
                 main_window.combobox_accounts.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                main_window.combobox_accounts.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
 
@@ -255,6 +309,20 @@ namespace Menere
         public static void add_debug_message(string title, string text = null) {
             if(debug_enabled) {
                 debug.Add(new MenereDebug(title, text: text));
+            }
+        }
+
+        public void toggle_listing()
+        {
+            if (Properties.Settings.Default.use_listView)
+            {
+                main_window.listbox_items.Visibility = System.Windows.Visibility.Collapsed;
+                main_window.listview_items.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                main_window.listbox_items.Visibility = System.Windows.Visibility.Visible;
+                main_window.listview_items.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
     }

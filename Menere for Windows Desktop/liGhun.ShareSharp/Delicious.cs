@@ -160,5 +160,11 @@ namespace ShareSharp
         {
             throw new NotImplementedException();
         }
+
+
+        public System.Collections.Generic.KeyValuePair<string, string> get_settings(string salt)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

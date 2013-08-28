@@ -9,7 +9,12 @@ namespace ShareSharp
     class Crypto
     {
 
-        static byte[] entropy = System.Text.Encoding.Unicode.GetBytes("V%o8Rc6)Oc iRr57e(%4/&Ic I/r/5E/wcurtzfd46s/uR0popöäb7");
+        public static byte[] entropy = System.Text.Encoding.Unicode.GetBytes("V%o8Rc6)Oc ifsdfsf%4/&Icgf I/45r/5E/wcurtzfd46s/uR0popöäb7");
+
+        public static void set_salt(string salt)
+        {
+            entropy = System.Text.Encoding.Unicode.GetBytes(salt);
+        }
 
         public static string EncryptString(System.Security.SecureString input)
         {

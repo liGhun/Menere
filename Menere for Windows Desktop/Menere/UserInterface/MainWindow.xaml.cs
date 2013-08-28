@@ -36,10 +36,19 @@ namespace Menere.UserInterface
         private int last_selected_index { get; set; }
         public ObservableCollection<IItem> current_shown_items { get; set; }
         private bool goto_button_pressed { get; set; }
+
+
         
         public MainWindow()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
+            }
+            catch (Exception exp)
+            {
+                Console.WriteLine(exp.Message);
+            }
 
             button_show_saved.Visibility = System.Windows.Visibility.Collapsed;
 
@@ -54,9 +63,13 @@ namespace Menere.UserInterface
             listbox_feeds.Items.SortDescriptions.Add(new SortDescription("title", ListSortDirection.Ascending));
             listbox_groups.Items.SortDescriptions.Add(new SortDescription("name", ListSortDirection.Ascending));
             listbox_items.ItemsSource = account.items;
+
+            listview_items.listview_items.SelectionChanged += listview_items_SelectionChanged;
+            listview_items.listview_items.PreviewKeyDown += listview_items_PreviewKeyDown;
+
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
-           // webbrowser.Navigated += webbrowser_Navigated;
+            webbrowser.Navigated += webbrowser_Navigated;
             textblock_item_title.Text = "";
 
             if (Properties.Settings.Default.windowHeight > 0 && Properties.Settings.Default.windowWidth > 0)
@@ -65,6 +78,11 @@ namespace Menere.UserInterface
                 this.Width = Properties.Settings.Default.windowWidth;
                 this.Left = Properties.Settings.Default.windowLocationX;
                 this.Top = Properties.Settings.Default.windowLocationY;
+            }
+
+            if (Properties.Settings.Default.top_grid_height > 0)
+            {
+                grid_topRow.Height = new GridLength(Properties.Settings.Default.top_grid_height);
             }
 
             filter_feeds();
@@ -77,6 +95,10 @@ namespace Menere.UserInterface
             update_timer.Start();
         }
 
+
+
+
+
         void update_timer_Tick(object sender, EventArgs e)
         {
  	        button_refresh_Click(null,null);
@@ -86,17 +108,22 @@ namespace Menere.UserInterface
         {
             update_header_items();
             filter_feeds();
-            if (AppController.Current.current_account.initial_fetch_completed)
+            if (AppController.Current.current_account != null)
             {
-                
-                filter_items();
+                if (AppController.Current.current_account.initial_fetch_completed)
+                {
+                    filter_items();
+                }
             }
         }
         private void update_header_items()
         {
-            button_show_unread.Content = string.Format("Unread items ({0})", account.unread_items.Count());
-            button_show_all.Content = string.Format("All items ({0})", account.items.Count());
-            button_show_saved.Content = string.Format("Saved items ({0})", account.saved_items.Count());
+            if (account != null)
+            {
+                button_show_unread.Content = string.Format("Unread items ({0})", account.unread_items.Count());
+                button_show_all.Content = string.Format("All items ({0})", account.items.Count());
+                button_show_saved.Content = string.Format("Saved items ({0})", account.saved_items.Count());
+            }
         }
         
 
@@ -114,6 +141,41 @@ namespace Menere.UserInterface
             if (listbox_items.SelectedItem != null)
             {
                 last_selected_index = Math.Max(0, listbox_items.SelectedIndex);
+            }
+
+            if (item != null)
+            {
+                textblock_item_title.Text = item.title;
+                textblock_feed_title.Text = item.feed.title;
+                if (string.IsNullOrWhiteSpace(item.html) || item.title.ToLower().Trim() == item.html.ToLower().Trim())
+                {
+                    webbrowser.Navigate(item.url);
+                }
+                else
+                {
+                    webbrowser.NavigateToString(create_html_content(item));
+                }
+            }
+            else
+            {
+                textblock_feed_title.Text = "";
+                textblock_item_title.Text = "";
+                webbrowser.NavigateToString("&nbsp;");
+            }
+        }
+
+        void listview_items_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Model.IItem item = listview_items.listview_items.SelectedItem as Model.IItem;
+            if (item == null && listbox_items.Items.Count > 0)
+            {
+                listview_items.listview_items.SelectedIndex = Math.Min(last_selected_index, Math.Max(0, listview_items.listview_items.Items.Count - 1));
+                return;
+            }
+
+            if (listbox_items.SelectedItem != null)
+            {
+                last_selected_index = Math.Max(0, listview_items.listview_items.SelectedIndex);
             }
 
             if (item != null)
@@ -204,13 +266,15 @@ namespace Menere.UserInterface
 
         private void listbox_items_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if(e!= null) 
+            handle_pressed_key(e, listbox_items.SelectedItem as IItem);
+        }
+
+        private void handle_pressed_key(KeyEventArgs e, IItem item)
+        {
+            if (e != null && item != null)
             {
-                //AppController.Current.snarl_interface.Notify(title: "Key", text: e.Key.ToString());
-                // mark read / unread
                 if (e.Key == Key.Space || e.Key == Key.M)
                 {
-                    Model.IItem item = listbox_items.SelectedItem as Model.IItem;
                     if (item != null)
                     {
                         if (!item.is_read)
@@ -220,22 +284,24 @@ namespace Menere.UserInterface
                                 item.mark_read();
                             });
                             item.is_read = true;
-                            try {
+                            try
+                            {
                                 item.receiving_account.unread_items.Remove(item);
-                            } catch {}
+                            }
+                            catch { }
                         }
                         else
                         {
                             ThreadPool.QueueUserWorkItem(delegate
-                             {
+                            {
                                 item.mark_unread();
-                             });
-                             item.is_read = false;
-                             try
-                             {
-                                 item.receiving_account.unread_items.Add(item);
-                             }
-                             catch { }
+                            });
+                            item.is_read = false;
+                            try
+                            {
+                                item.receiving_account.unread_items.Add(item);
+                            }
+                            catch { }
                         }
                     }
                 }
@@ -243,7 +309,6 @@ namespace Menere.UserInterface
                 // save for later reading
                 if (e.Key == Key.S && !goto_button_pressed)
                 {
-                    Model.IItem item = listbox_items.SelectedItem as Model.IItem;
                     if (item != null)
                     {
                         if (!item.is_saved)
@@ -287,7 +352,7 @@ namespace Menere.UserInterface
                 // open full inline
                 if (e.Key == Key.Return)
                 {
-                    Model.IItem item = listbox_items.SelectedItem as Model.IItem;
+
                     if (item != null)
                     {
                         webbrowser.Navigate(item.url);
@@ -297,7 +362,7 @@ namespace Menere.UserInterface
                 // open full in browser
                 if (e.Key == Key.Right || e.Key == Key.V)
                 {
-                    Model.IItem item = listbox_items.SelectedItem as Model.IItem;
+
                     if (item != null)
                     {
                         System.Diagnostics.Process.Start(item.url);
@@ -355,11 +420,26 @@ namespace Menere.UserInterface
             }
         }
 
+        void listview_items_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            handle_pressed_key(e, listview_items.listview_items.SelectedItem as IItem);
+        }
+
         public void move_within_items(int number_of_items)
         {
-            if (listbox_items.Items.Count > 0)
+            if (Properties.Settings.Default.use_listView)
             {
-                listbox_items.SelectedIndex = Math.Max(0,Math.Min(listbox_items.Items.Count - 1, listbox_items.SelectedIndex + number_of_items));
+                if (listview_items.listview_items.Items.Count > 0)
+                {
+                    listview_items.listview_items.SelectedIndex = Math.Max(0, Math.Min(listview_items.listview_items.Items.Count - 1, listview_items.listview_items.SelectedIndex + number_of_items));
+                }
+            }
+            else
+            {
+                if (listbox_items.Items.Count > 0)
+                {
+                    listbox_items.SelectedIndex = Math.Max(0, Math.Min(listbox_items.Items.Count - 1, listbox_items.SelectedIndex + number_of_items));
+                }
             }
         }
 
@@ -496,6 +576,8 @@ namespace Menere.UserInterface
                        return true;
                    }
                };
+
+            listview_items.listview_items.Items.Filter = listbox_items.Items.Filter;
         }
 
         private void button_remove_feed_filter_Click(object sender, RoutedEventArgs e)
@@ -588,6 +670,7 @@ namespace Menere.UserInterface
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
             listbox_items.ItemsSource = account.unread_items;
+            listview_items.listview_items.ItemsSource = account.unread_items;
             current_shown_items = account.unread_items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
@@ -610,6 +693,7 @@ namespace Menere.UserInterface
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
             listbox_items.ItemsSource = null;
             listbox_items.ItemsSource = account.saved_items;
+            listview_items.listview_items.ItemsSource = account.saved_items;
             current_shown_items = account.saved_items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
@@ -631,6 +715,7 @@ namespace Menere.UserInterface
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
             listbox_items.ItemsSource = account.items;
+            listview_items.listview_items.ItemsSource = account.items;
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
@@ -644,6 +729,20 @@ namespace Menere.UserInterface
             preferences.Show();
         }
 
-        
+       
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Properties.Settings.Default.windowHeight = this.Height;
+            Properties.Settings.Default.windowWidth = this.Width;
+            Properties.Settings.Default.windowLocationX = this.Left;
+            Properties.Settings.Default.windowLocationY = this.Top;
+
+            Properties.Settings.Default.top_grid_height = grid_topRow.Height.Value;
+
+            Properties.Settings.Default.Save();
+        }
+
+   
+
     }
 }

@@ -7,14 +7,19 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:converters="clr-namespace:Menere.Converters"
         Background="{DynamicResource ResourceKey=color_main_background}"
-        Foreground="{DynamicResource ResourceKey=color_main_foreground}" Icon="/Menere;component/Images/MenereIcon.ico">
+        Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
+        Icon="/Menere;component/Images/MenereIcon.ico"
+        Closing="Window_Closing">
     <Grid Name="grid_main" Focusable="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="196" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-
-        <Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="172" MinHeight="100" Name="grid_topRow" />
+            <RowDefinition Height="*" MinHeight="100" />
+        </Grid.RowDefinitions>
+            <Grid.Resources>
             <converters:ItemWidthConverter x:Key="ItemWidthConverter1" />
             <DataTemplate DataType="{x:Type model:FeverItem}">
                 <controls:ItemBox x:Name="item" HorizontalAlignment="Stretch" DataContext="{Binding}" Width="{Binding ElementName=listbox_items, Path=ActualWidth, Mode=OneWay, Converter={StaticResource ItemWidthConverter1}, ConverterParameter=23}"  Margin="0,0,6,0" />
@@ -23,49 +28,65 @@
                 <controls:ItemBox x:Name="item" HorizontalAlignment="Stretch" DataContext="{Binding}" Width="{Binding ElementName=listbox_items, Path=ActualWidth, Mode=OneWay, Converter={StaticResource ItemWidthConverter1}, ConverterParameter=23}"  Margin="0,0,6,0" />
             </DataTemplate>
         </Grid.Resources>
+
         <ListBox Name="listbox_feeds"
             Background="{DynamicResource ResourceKey=color_content_background}" 
                  ToolTip="Select feed to filter items list"
-                 Grid.Column="0"
+                 Grid.Column="0" Grid.Row="1"
                  Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
-                  Margin="10,211,0,9.8" HorizontalAlignment="Left" Width="178" 
+                  Margin="10,35,0,10" HorizontalAlignment="Stretch" 
+                 VerticalAlignment="Stretch" 
                  SelectionChanged="listbox_feeds_SelectionChanged"
                  ScrollViewer.HorizontalScrollBarVisibility="Hidden">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <controls:FeedBox x:Name="feed" HorizontalAlignment="Stretch" />
+                    <controls:FeedBox x:Name="feed" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+
+        
+
         <ListBox
             Name="listbox_items"
             Background="{DynamicResource ResourceKey=color_content_background}"
         Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
-                 Grid.Column="1"
-                  Margin="10,33,10.4,0" 
-                 SelectionChanged="listbox_items_SelectionChanged" Height="139" VerticalAlignment="Top" 
+                 Grid.Column="1" Grid.Row="0"
+                  Margin="10,33,10,3" 
+                 SelectionChanged="listbox_items_SelectionChanged" 
+                VerticalAlignment="Stretch" 
+                HorizontalAlignment="Stretch"
                  PreviewKeyDown="listbox_items_PreviewKeyDown"
                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                  >
 
         </ListBox>
+        
+        <controls:ListViewItems x:Name="listview_items"
+                                Grid.Column="1" Grid.Row="0"
+                  Margin="10,33,10,3" 
+                 VerticalAlignment="Stretch" 
+                  HorizontalAlignment="Stretch"
+ />
+        
         <TextBlock Name="textblock_copyright"
-            Grid.Column="0"
-            TextAlignment="Center" Margin="11,176,9,0" 
-                   TextWrapping="Wrap" Text="Meneré © 2013 li' Ghun (Sven Walther)" VerticalAlignment="Top" Width="176"
+            Grid.Column="0" Grid.Row="1"
+            TextAlignment="Left" Margin="10,0,9,0" 
+                   TextWrapping="Wrap" Text="Meneré © 2013 Sven Walther" VerticalAlignment="Top" 
+                   Width="176"
                    Opacity="0.3"
                    FontSize="10"/>
 
         <TextBlock Name="textblock_header_feeds"
-            Grid.Column="0"
-            HorizontalAlignment="Left" Margin="10,190,0,0" TextWrapping="Wrap" Text="Feeds" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.589,1.14"/>
+            Grid.Column="0" Grid.Row="1"
+            HorizontalAlignment="Left" Margin="10,14,0,0" TextWrapping="Wrap" Text="Feeds" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.589,1.14"/>
 
         <TreeView Name="listbox_groups"
-                  Grid.Column="0"
+                  Grid.Column="0" Grid.Row="0"
                   Background="{DynamicResource ResourceKey=color_content_background}"
         Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
-                 HorizontalAlignment="Left" Margin="10,33,0,0" Width="178" Height="139" 
-                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch" Margin="10,33,00,3" 
+                 VerticalAlignment="Stretch"
                   BorderThickness="1"
                   BorderBrush="{DynamicResource ResourceKey=color_main_foreground}"
                   ScrollViewer.HorizontalScrollBarVisibility="Hidden"
@@ -76,8 +97,17 @@
                 </DataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>
-        <TextBlock Grid.Column="0" Name="textblock_foldername" HorizontalAlignment="Left" Margin="10,12,0,0" TextWrapping="Wrap" Text="Groups / Folders" VerticalAlignment="Top" RenderTransformOrigin="-0.96,0.609" FontWeight="Bold"/>
-        <Button Grid.Column="0"  
+
+        <GridSplitter ResizeDirection="Rows" 
+                  Height="4"
+                      Grid.Row="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" 
+                      Margin="8,0,8,0"
+                    VerticalAlignment="Bottom">
+           
+        </GridSplitter>
+
+        <TextBlock Grid.Column="0" Grid.Row="0" Name="textblock_foldername" HorizontalAlignment="Left" Margin="10,12,0,0" TextWrapping="Wrap" Text="Groups / Folders" VerticalAlignment="Top" RenderTransformOrigin="-0.96,0.609" FontWeight="Bold"/>
+        <Button Grid.Column="0" Grid.Row="0"
                 Height="14" MaxWidth="14"
                 Name="button_remove_folder_filter" 
                 ToolTip="Remove filter"
@@ -87,23 +117,26 @@
         </Button>
 
         <VirtualizingStackPanel Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left"  Height="22" Margin="10,6,0,0" Orientation="Horizontal">
-            <Button Name="button_show_unread" Content="Unread items" Margin="4,0,0,0.4" Height="22" VerticalAlignment="Bottom" Click="button_show_unread_Click"/>
+            <Button Name="button_show_unread" Content="Unread items" Margin="4,0,0,0" Height="22" VerticalAlignment="Top" Click="button_show_unread_Click"/>
             <Button Name="button_show_saved" Content="Saved items" Margin="4,0,0,0.4" Height="22" VerticalAlignment="Bottom" Click="button_show_saved_Click"/>
             <Button Name="button_show_all" Content="All items" Margin="4,0,0,0" Click="button_show_all_Click" />
         </VirtualizingStackPanel>
-        <Border Name="border_webbrowser" Grid.Column="1" Margin="10,211,10.4,9.8"
+        <Border Name="border_webbrowser" Grid.Column="1" Grid.Row="1" Margin="10,35,10.4,9.8"
                 Background="{DynamicResource ResourceKey=color_content_background}"
                 BorderThickness="1"
-                BorderBrush="{DynamicResource ResourceKey=color_main_foreground}">
+                BorderBrush="{DynamicResource ResourceKey=color_main_foreground}"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                >
             <WebBrowser Name="webbrowser" Margin="0"/>
         </Border>
-        <TextBlock Grid.Column="1"  Name="textblock_item_title" Margin="10,172,10.4,0" TextWrapping="NoWrap" Text="Item title" VerticalAlignment="Top" Height="22" FontWeight="Bold" FontSize="18"/>
-        <TextBlock Grid.Column="1"  Name="textblock_feed_title" Margin="10,192,9.4,0" 
+        <TextBlock Grid.Column="1" Grid.Row="1" Name="textblock_item_title" Margin="10,-3,10.4,0" TextWrapping="NoWrap" Text="Item title" VerticalAlignment="Top" Height="22" FontWeight="Bold" FontSize="18"/>
+        <TextBlock Grid.Column="1" Grid.Row="1" Name="textblock_feed_title" Margin="10,17,9.4,0" 
                    TextWrapping="NoWrap" Text="Click an entry..." VerticalAlignment="Top" Height="17"  
                    FontSize="12" Foreground="{DynamicResource ResourceKey=color_feed_name_header}"
                    Background="Transparent"/>
 
-        <Button Grid.Column="0" Height="14" MaxWidth="14" Style="{DynamicResource ResourceKey=button_without_border}" Name="button_remove_feed_filter" ToolTip="Remove feed filter" HorizontalAlignment="Left" Margin="172,192,0,0" VerticalAlignment="Top" Click="button_remove_feed_filter_Click" RenderTransformOrigin="0.389,-1.029">
+        <Button Grid.Column="0" Grid.Row="1" Height="14" MaxWidth="14" Style="{DynamicResource ResourceKey=button_without_border}" Name="button_remove_feed_filter" ToolTip="Remove feed filter" HorizontalAlignment="Left" Margin="172,16,0,0" VerticalAlignment="Top" Click="button_remove_feed_filter_Click">
             <Image Name="image_remove_filter_feeds" Source="{DynamicResource button_remove_filter}"/>
         </Button>
         <VirtualizingStackPanel Grid.Column="1" Height="22" Name="stackpanel_header" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,6,0,0">

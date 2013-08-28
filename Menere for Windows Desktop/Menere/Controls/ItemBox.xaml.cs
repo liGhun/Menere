@@ -22,70 +22,31 @@ namespace Menere.Controls
     /// </summary>
     public partial class ItemBox : UserControl
     {
+        
         public ItemBox()
         {
             InitializeComponent();
-
-            if (AppController.active_external_services.Count > 0)
-            {
-                MenuItem menu_send_to = new MenuItem();
-                menu_send_to.Header = "Send to...";
-
-                foreach (ShareSharp.IShareService service in AppController.active_external_services)
-                {
-
-                    MenuItem menu_item_service = new MenuItem();
-                    menu_item_service.Header = service.Name;
-                    menu_item_service.PreviewMouseDown += menu_item_service_PreviewMouseDown;
-                    menu_item_service.Click += menu_item_service_Click;
-                    menu_item_service.CommandParameter = service;
-                    menu_send_to.Items.Add(service);
-                }
-
-                border_around_item.ContextMenu.Items.Add(menu_send_to);
-            }
+            AppController.active_external_services.CollectionChanged += active_external_services_CollectionChanged;
+            this.DataContextChanged += ItemBox_DataContextChanged;
         }
 
-        void menu_item_service_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        void ItemBox_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            MenuItem menu_item = sender as MenuItem;
-            if (menu_item != null)
-            {
-                IItem item = this.DataContext as IItem;
-                ShareSharp.IShareService service = menu_item.CommandParameter as ShareSharp.IShareService;
-                if (item != null && service != null)
-                {
-                    string text = item.html;
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        text = "";
-                    }
-                    text = System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
-                    service.SendNow(item.title, text, item.url);
-                }
-            }
+            update_context_menu();
         }
 
-        void menu_item_service_Click(object sender, RoutedEventArgs e)
+        private void update_context_menu()
         {
-
-            MenuItem menu_item = sender as MenuItem;
-            if (menu_item != null)
-            {
-                IItem item = this.DataContext as IItem;
-                ShareSharp.IShareService service = menu_item.CommandParameter as ShareSharp.IShareService;
-                if (item != null && service != null)
-                {
-                    string text = item.html;
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        text = "";
-                    }
-                    text = System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
-                    service.SendNow(item.title, text, item.url);
-                }
-            }
+            ItemContextMenu item_context_menu = new ItemContextMenu();
+            border_around_item.ContextMenu = item_context_menu.get_context_menu(this.DataContext as IItem);
         }
+
+        private void active_external_services_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            update_context_menu();
+        }
+
+
 
         private void button_mark_read_Click(object sender, RoutedEventArgs e)
         {

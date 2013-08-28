@@ -6,39 +6,175 @@
         <TabControl Name="tabControl_preferencs_main">
             <TabItem Name="tabItem_accounts" Header="Accounts">
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListBox Name="listbox_accounts" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0"/>
-                    <StackPanel Name="stackpanel_account_buttons" Orientation="Vertical" Grid.Column="1">
-                        
+                    
+                    <TextBlock Name="textblock_header_list_accounts" Text="Authorized accounts" FontWeight="Bold" Grid.Column="0" Grid.Row="0" />
+                    
+                    <ListBox Name="listbox_accounts" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0" SelectionChanged="listbox_accounts_SelectionChanged"/>
+                    <StackPanel Name="stackpanel_account_buttons" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+                        <Button Name="button_add_aol" Content="+ AOL" Visibility="Collapsed" />
+                        <Button Name="button_add_feedly" Content="+ Feedly" Click="button_add_feedly_Click" />
+                        <Button Name="button_add_fever" Content="+ Fever" Click="button_add_fever_Click" />
+                        <Button Name="button_remove_rss_account" Content="- Remove" Margin="0,10,0,0" IsEnabled="False" Click="button_remove_rss_account_Click" />
                     </StackPanel>
                 </Grid>
             </TabItem>
 
             <TabItem Name="tabItem_layout" Header="Layout">
+                <Grid Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                        <TextBlock Text="Available themes" FontWeight="Bold" />
+                    <ListBox Name="listbox_themes" Grid.Column="0" Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0">
+                        <ListBoxItem Name="listBoxItemThemesExample" Content="Solarized Light (Default theme)" />
+                    </ListBox>
+                    <TextBlock Name="textblock_themes_more_to_come" Opacity="0.5"
+                               Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1" Margin="6,40,6,0"
+                               TextWrapping="Wrap"
+                               Text="Themes will be added in a later release including the option for user created themes. See the Chapper themes for a first idea on what will be possible." />
 
+                    <StackPanel Name="stackpanel_themes_buttons" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
+                        
+                        <Button Name="button_apply_theme" Content="Apply theme" IsEnabled="False" />
+                    </StackPanel>
+
+                    <TextBlock Name="textblock_header_layout_options" Text="Layout options" FontWeight="Bold" Grid.Column="3" Grid.Row="0" />
+                    <CheckBox Name="checkbox_use_list_view" Grid.Column="3" Grid.Row="1" Content="Use alternate list view" Checked="checkbox_use_list_view_Checked" Unchecked="checkbox_use_list_view_Unchecked" ToolTip="Show the items as a traditional list view with columns"/>
+                </Grid>
+               
             </TabItem>
 
             <TabItem Name="tabItem_external_services" Header="Services">
                 <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="8"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListBox Name="listbox_external_services" Grid.Column="0" />
-                    <StackPanel Name="stackpanel_services_buttons" Orientation="Vertical" Grid.Column="1">
+                    
+                    <TextBlock Name="textblock_available_services_header" Text="Active services" FontWeight="Bold" />
+                    <ListBox Name="listbox_external_services" Grid.Column="0" Grid.Row="1" SelectionChanged="listbox_external_services_SelectionChanged" />
+                    <StackPanel Name="stackpanel_services_buttons" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
                         <Button Name="button_add_app_net" Content="+ App.net" Click="button_add_app_net_Click"/>
-                        <Button Name="button_remove_account" Content="Delete"/>
+                        <Button Name="button_add_pocket" Content="+ Pocket" Click="button_add_pocket_Click_1" />
+                        <Button Name="button_remove_account" Content="- Remove" IsEnabled="False" Margin="0,10,0,0" Click="button_remove_account_Click"/>
                     </StackPanel>
                 </Grid>
             </TabItem>
 
+            <TabItem Name="tabItem_keyboard_shortcuts" Header="Keyboard shortcuts">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Name="textblock_keyboard_shortcuts_header" Text="Available keyboard shortcuts" FontWeight="Bold" />
+                    
+                    <TextBlock Name="textblock_keyboard_shortcuts" Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1"
+                             TextWrapping="Wrap"  
+                               Margin="6,0,0,0"
+                              Text="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: down arrow or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu"></TextBlock>
+                        
+                </Grid>
+            </TabItem>
+
             <TabItem Name="tabItem_about" Header="About">
-                <TextBlock Name="textblock_about" Text="Meneré for Windows Desktop by Dog Food Soft"/>
+                <Grid>
+                    <VirtualizingStackPanel Orientation="Vertical">
+                        <TextBlock Name="textblock_about" 
+                               Text="Meneré for Windows Desktop" 
+                               FontSize="30" Margin="0,0,48.2,0"/>
+                        <TextBlock Name="textblock_by" 
+                               Text="by Dog Food Soft (formerly known as liGhun)" 
+                               FontSize="12"/>
+                        <TextBlock Name="textblock_credits_header" 
+                               Text="Credits" 
+                               FontSize="20" Margin="0,10,0,0"/>
+                        <RichTextBox Name="richtTextBox_credits" IsDocumentEnabled="True" IsReadOnly="True">
+                            <FlowDocument>
+                                <Paragraph>
+                                    <Bold>Menere</Bold>
+                                    is a RSS client to many services and uses some external ressources (in alphabetical order):
+                                </Paragraph>
+                                <Paragraph>
+                                    <Hyperlink NavigateUri="https://github.com/liGhun/AppNet.NET">
+                                        <Run Text="AppNet.NET"/>
+                                    </Hyperlink> :
+                                an Open Source library to access App.net by Sven Walther.
+                                    <LineBreak />
+                                    <Hyperlink NavigateUri="https://github.com/liGhun/AppNet.NET/blob/master/LICENSE.txt">
+                                        <Run Text="License"/>
+                                    </Hyperlink>
+                                </Paragraph>
+                                <Paragraph>
+                                    <Hyperlink NavigateUri="https://wpftoolkit.codeplex.com/">
+                                        <Run Text="Extended WPF Toolkit Community Edition"/>
+                                    </Hyperlink> :
+                                is the number one collection of WPF controls, components and utilities for creating next generation Windows applications.
+                                    <LineBreak />
+                                    <Hyperlink NavigateUri="https://wpftoolkit.codeplex.com/license">
+                                        <Run Text="License"/>
+                                    </Hyperlink>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <Hyperlink NavigateUri="http://google.com">
+                                        <Run Text="GLYPHICONS FREE"/>
+                                    </Hyperlink> :
+                                is a library of precisely prepared monochromatic icons and symbols, created with an emphasis on simplicity and easy orientation.
+                                    <LineBreak />
+                                    <Hyperlink NavigateUri="http://glyphicons.com/license/">
+                                        <Run Text="License"/>
+                                    </Hyperlink>
+                                </Paragraph>
+
+                                <Paragraph>
+                                    <Hyperlink NavigateUri="https://github.com/liGhun/RSSharp">
+                                        <Run Text="RSSharp"/>
+                                    </Hyperlink> :
+                                an Open Source library to access various RSS services using .NET by Sven Walther.
+                                    <LineBreak />
+                                    <Hyperlink NavigateUri="http://opensource.org/licenses/BSD-3-Clause">
+                                        <Run Text="License"/>
+                                    </Hyperlink>
+                                </Paragraph>
+
+
+                            </FlowDocument>
+                        </RichTextBox>
+
+                    </VirtualizingStackPanel>
+                    <Image HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="100" Source="/Menere;component/Images/MenereIcon.png"/>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

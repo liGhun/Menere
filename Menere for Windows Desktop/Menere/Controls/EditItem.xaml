@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="150" d:DesignWidth="500">
     <Grid Name="grid_main">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -13,9 +13,12 @@
         <Grid Name="grid_content" Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="24" />
                 <RowDefinition Height="24" />
                 <RowDefinition Height="24" />
                 <RowDefinition Height="24" />
@@ -24,9 +27,10 @@
             <TextBlock Name="textblock_item_title" Text="Item title" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right"/>
             <TextBlock Name="textblock_tags_title" Text="Tags" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"/>
 
-            <TextBlock Name="textblock_feed" Text="{Binding Path=feed.title}" Grid.Row="0" Grid.Column="1"/>
-            <TextBlock Name="textblock_item" Text="{Binding Path=title}" Grid.Row="1" Grid.Column="1"/>
-            <TextBox Name="textbox_tags" Grid.Row="2" Grid.Column="1" Text="{Binding Path=tag_string, Mode=OneWay}" />
+            <TextBlock Name="textblock_feed" Text="{Binding Path=feed.title}" Grid.Row="0" Grid.Column="2"/>
+            <TextBlock Name="textblock_item" Text="{Binding Path=title}" Grid.Row="1" Grid.Column="2"/>
+            <TextBox Name="textbox_tags" Grid.Row="2" Grid.Column="2" Text="{Binding Path=tag_string, Mode=OneWay}" />
+            <TextBlock Name="textblock_to_be_extended" Text="Note: this edit window will be extended in later versions..." Grid.Row="3" Grid.Column="2" Opacity="0.5"/>
         </Grid>
         <Grid Name="grid_buttons" Grid.Row="1"  VerticalAlignment="Center" HorizontalAlignment="Stretch">
             <Button Name="button_cancel" Content="Cancel" Width="50" Margin="5,0,0,0" HorizontalAlignment="Left"/>

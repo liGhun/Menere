@@ -150,5 +150,75 @@ namespace ShareSharp
         {
             throw new NotImplementedException();
         }
+
+
+        public System.Collections.Generic.KeyValuePair<string, string> get_settings(string salt)
+        {
+            throw new NotImplementedException();
+        }
+
+        string IShareService.Name
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        string IShareService.Description
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        string IShareService.Homepage
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        bool IShareService.Verified
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        string IShareService.LastError
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        string IShareService.ServiceIcon
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        string IShareService.ApiKey
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        bool IShareService.NeedsApiKey
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        System.Collections.Generic.KeyValuePair<string, string> IShareService.get_settings(string salt)
+        {
+            throw new NotImplementedException();
+        }
+
+        ShareResponse IShareService.SendNow(string title, string description, string url)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

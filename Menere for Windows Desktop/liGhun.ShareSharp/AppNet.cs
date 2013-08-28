@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AppNetDotNet.ApiCalls;
 using AppNetDotNet.Model;
+using System.Text.RegularExpressions;
 
 namespace ShareSharp
 {
@@ -111,8 +112,9 @@ namespace ShareSharp
 
         public bool Verified
         {
-            get;
-            set;
+            get { return (user != null); }
+
+            set {}
         }
 
         public string LastError
@@ -148,10 +150,55 @@ namespace ShareSharp
             link.text = title;
             link.url = url;
             link.pos = 0;
-            link.len = title.Length;
+            link.len = Math.Min(title.Length, 256);
             entities.links.Add(link);
-            AppNetDotNet.ApiCalls.Posts.create(this.access_token, title + " " + description, entities:entities);
+            string post_text = title + " " + Regex.Replace(description, @"^\s*$", "", RegexOptions.Multiline);
+            if(post_text.Length > 256) {
+                post_text = post_text.Substring(0,253) +  "...";
+            }
+
+            AppNetDotNet.ApiCalls.Posts.create(this.access_token, post_text, entities:entities);
             return new ShareResponse();
+        }
+
+
+        public KeyValuePair<string, string> get_settings(string salt)
+        {
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(appNet_settings));
+            appNet_settings settings = new appNet_settings();
+            settings.access_token = this.access_token;
+            System.IO.MemoryStream memorywriter = new System.IO.MemoryStream();
+            serializer.Serialize(memorywriter, settings);
+            memorywriter.Flush();
+            memorywriter.Position = 0;
+            System.IO.StreamReader sr = new System.IO.StreamReader(memorywriter);
+            string settings_string = sr.ReadToEnd();
+
+            Crypto.set_salt(salt);
+            settings_string = Crypto.EncryptString(Crypto.ToSecureString(settings_string));
+
+            return new KeyValuePair<string, string>("App.net", settings_string);
+        }
+        public void load_settings(string enycrpted_settings_string, string salt)
+        {
+            // Init XML reader and settings class
+            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(appNet_settings));
+            appNet_settings settings = new appNet_settings();
+
+            // Decrypt the string
+            Crypto.set_salt(salt);
+            string settings_string = Crypto.ToInsecureString(Crypto.DecryptString(enycrpted_settings_string));
+
+            // load settings
+            // note: by setting the access token Verified is set automatically in this class
+            settings = (appNet_settings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+            this.access_token = settings.access_token;
+        }
+
+
+        public class appNet_settings
+        {
+            public string access_token { get; set; }
         }
     }
 }

@@ -6,18 +6,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              xmlns:converters="clr-namespace:Menere.Converters">
-    <Border x:Name="border_around_item" Style="{DynamicResource theme_border_around_item}" HorizontalAlignment="Stretch">
-        <Border.ContextMenu>
-            <ContextMenu Name="context_menu">
-                <MenuItem Name="contextMenu_edit_tags" Click="contextMenu_edit_tags_Click" Header="Edit item" />
-            </ContextMenu>
-        </Border.ContextMenu>
+    <Border x:Name="border_around_item" Style="{DynamicResource theme_border_around_item}" HorizontalAlignment="Stretch">            
         <Grid MouseDown="Grid_MouseDown" Style="{DynamicResource theme_grid_around_item}">
             <Grid.Resources>
                 <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
             </Grid.Resources>
-            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" 
-                                    ToolTip="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: down arrow or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu">
+            <VirtualizingStackPanel Name="stackpanel_item" Orientation="Vertical" >
+                                    
                 <VirtualizingStackPanel Name="stackpanel_item_header" Orientation="Horizontal">
                     <Image Source="{Binding Path=feed.icon_path}"  Name="image_faviconItem" MinWidth="24" Height="24" MaxHeight="32" MaxWidth="32" Margin="0,2,9,2" ImageFailed="image_faviconItem_ImageFailed">
                         <Image.Effect>

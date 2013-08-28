@@ -636,5 +636,24 @@ namespace Menere.Model
             }
 
         }
+
+        ~FeedlyAccount()
+        {
+            try
+            {
+                saved_items.Clear();
+                unread_items.Clear();
+                items.Clear();
+                if (backgroundWorker_update_entries.IsBusy != null)
+                {
+                    backgroundWorker_update_entries.CancelAsync();
+                }
+                backgroundWorker_update_entries = null;
+                saved_items = null;
+                unread_items = null;
+                items = null;
+            }
+            catch { }
+        }
     }
 }

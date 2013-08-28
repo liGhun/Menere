@@ -174,5 +174,11 @@ namespace ShareSharp
         {
             get { return false; }
         }
+
+
+        public KeyValuePair<string, string> get_settings(string salt)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

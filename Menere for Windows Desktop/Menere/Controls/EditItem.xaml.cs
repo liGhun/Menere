@@ -21,6 +21,12 @@ namespace Menere.Controls
     /// </summary>
     public partial class EditItem : UserControl
     {
+        public EditItem(IItem item)
+        {
+            InitializeComponent();
+            this.DataContext = item;
+        }
+
         public EditItem()
         {
             InitializeComponent();
