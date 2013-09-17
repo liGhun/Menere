@@ -10,7 +10,8 @@ namespace Menere.Helper
     {
         public static string remove_html(string text)
         {
-            return System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
+            string plain = System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", string.Empty);
+            return System.Web.HttpUtility.HtmlDecode(plain);
         }
 
         public static string get_command_line_text(string text, int max_length = -1)
