@@ -1,3 +1,6 @@
+0.9
+Setup file and executable are now digitally signed
+
 0.8
 Alternative item display as a list with single line entries
  - needs less space
