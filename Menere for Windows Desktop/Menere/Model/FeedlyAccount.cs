@@ -455,7 +455,14 @@ namespace Menere.Model
         {
             System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(FeedlySettings));
             FeedlySettings settings = new FeedlySettings();
-            settings = (FeedlySettings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+            try
+            {
+                settings = (FeedlySettings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+            }
+            catch
+            {
+                return;
+            }
             this.token = settings.token;
             this.refresh_token = settings.refresh_token;
             this.get_token_by_refresh_token();

@@ -306,21 +306,25 @@ namespace ShareSharp
 
         public void load_settings(string enycrpted_settings_string, string salt)
         {
-            // Init XML reader and settings class
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(pocket_settings));
-            pocket_settings settings = new pocket_settings();
+            try
+            {
+                // Init XML reader and settings class
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(pocket_settings));
+                pocket_settings settings = new pocket_settings();
 
-            // Decrypt the string
-            Crypto.set_salt(salt);
-            string settings_string = Crypto.ToInsecureString(Crypto.DecryptString(enycrpted_settings_string));
+                // Decrypt the string
+                Crypto.set_salt(salt);
+                string settings_string = Crypto.ToInsecureString(Crypto.DecryptString(enycrpted_settings_string));
 
-            // load settings
-            // note: by setting the access token Verified is set automatically in this class
-            settings = (pocket_settings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
-            this.access_token = settings.access_token;
-            this.consumer_key = settings.consumer_key;
-            this.Username = settings.username;
-            this.VerifyCredentials();
+                // load settings
+                // note: by setting the access token Verified is set automatically in this class
+                settings = (pocket_settings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+                this.access_token = settings.access_token;
+                this.consumer_key = settings.consumer_key;
+                this.Username = settings.username;
+                this.VerifyCredentials();
+            }
+            catch { }
         }
 
         public class pocket_settings

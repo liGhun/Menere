@@ -1,5 +1,7 @@
 0.9
 Setup file and executable are now digitally signed
+When sending a post to e.g. App.net the html entities are now converted to readable characters
+Reading configuration now ignores entries which have been encrypted using another user (e.g. when copied from an old harddisk). Did crash before
 
 0.8
 Alternative item display as a list with single line entries

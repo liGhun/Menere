@@ -151,12 +151,16 @@ namespace Menere.Model
 
         public void load_settings(string settings_string)
         {
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(FeverSettings));
-            FeverSettings settings = new FeverSettings();
-            settings = (FeverSettings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
-            this.email = settings.email;
-            this.api_key = settings.api_key;
-            this.url = settings.url;
+            try
+            {
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(FeverSettings));
+                FeverSettings settings = new FeverSettings();
+                settings = (FeverSettings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+                this.email = settings.email;
+                this.api_key = settings.api_key;
+                this.url = settings.url;
+            }
+            catch { }
         }
 
 

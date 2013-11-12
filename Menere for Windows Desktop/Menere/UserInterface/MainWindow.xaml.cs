@@ -57,12 +57,13 @@ namespace Menere.UserInterface
             button_remove_folder_filter.Visibility = System.Windows.Visibility.Collapsed;
 
             account = AppController.Current.current_account as Model.IAccount;
+
             listbox_feeds.ItemsSource = account.feeds;
             listbox_groups.ItemsSource = account.groups;
-            listbox_items.Items.SortDescriptions.Add(new SortDescription("created", ListSortDirection.Ascending));
+            listbox_items.listview_items.Items.SortDescriptions.Add(new SortDescription("created", ListSortDirection.Ascending));
+            listbox_items.listview_items.SelectionChanged += listbox_items_SelectionChanged;
             listbox_feeds.Items.SortDescriptions.Add(new SortDescription("title", ListSortDirection.Ascending));
             listbox_groups.Items.SortDescriptions.Add(new SortDescription("name", ListSortDirection.Ascending));
-            listbox_items.ItemsSource = account.items;
 
             listview_items.listview_items.SelectionChanged += listview_items_SelectionChanged;
             listview_items.listview_items.PreviewKeyDown += listview_items_PreviewKeyDown;
@@ -120,9 +121,9 @@ namespace Menere.UserInterface
         {
             if (account != null)
             {
-                button_show_unread.Content = string.Format("Unread items ({0})", account.unread_items.Count());
-                button_show_all.Content = string.Format("All items ({0})", account.items.Count());
-                button_show_saved.Content = string.Format("Saved items ({0})", account.saved_items.Count());
+                button_show_unread.Content = string.Format("Unread ({0})", account.unread_items.Count());
+                button_show_all.Content = string.Format("All ({0})", account.items.Count());
+                button_show_saved.Content = string.Format("Saved ({0})", account.saved_items.Count());
             }
         }
         
@@ -131,16 +132,16 @@ namespace Menere.UserInterface
 
         private void listbox_items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Model.IItem item = listbox_items.SelectedItem as Model.IItem;
-            if (item == null && listbox_items.Items.Count > 0)
+            Model.IItem item = listbox_items.listview_items.SelectedItem as Model.IItem;
+            if (item == null && listbox_items.listview_items.Items.Count > 0)
             {
-                listbox_items.SelectedIndex = Math.Min(last_selected_index,Math.Max(0, listbox_items.Items.Count - 1));
+                listbox_items.listview_items.SelectedIndex = Math.Min(last_selected_index,Math.Max(0, listbox_items.listview_items.Items.Count - 1));
                 return;
             }
 
-            if (listbox_items.SelectedItem != null)
+            if (listbox_items.listview_items.SelectedItem != null)
             {
-                last_selected_index = Math.Max(0, listbox_items.SelectedIndex);
+                last_selected_index = Math.Max(0, listbox_items.listview_items.SelectedIndex);
             }
 
             if (item != null)
@@ -162,18 +163,19 @@ namespace Menere.UserInterface
                 textblock_item_title.Text = "";
                 webbrowser.NavigateToString("&nbsp;");
             }
+        
         }
 
         void listview_items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Model.IItem item = listview_items.listview_items.SelectedItem as Model.IItem;
-            if (item == null && listbox_items.Items.Count > 0)
+            if (item == null && listbox_items.listview_items.Items.Count > 0)
             {
                 listview_items.listview_items.SelectedIndex = Math.Min(last_selected_index, Math.Max(0, listview_items.listview_items.Items.Count - 1));
                 return;
             }
 
-            if (listbox_items.SelectedItem != null)
+            if (listbox_items.listview_items.SelectedItem != null)
             {
                 last_selected_index = Math.Max(0, listview_items.listview_items.SelectedIndex);
             }
@@ -266,7 +268,7 @@ namespace Menere.UserInterface
 
         private void listbox_items_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            handle_pressed_key(e, listbox_items.SelectedItem as IItem);
+            handle_pressed_key(e, listbox_items.listview_items.SelectedItem as IItem);
         }
 
         private void handle_pressed_key(KeyEventArgs e, IItem item)
@@ -431,14 +433,14 @@ namespace Menere.UserInterface
             {
                 if (listview_items.listview_items.Items.Count > 0)
                 {
-                    listview_items.listview_items.SelectedIndex = Math.Max(0, Math.Min(listview_items.listview_items.Items.Count - 1, listview_items.listview_items.SelectedIndex + number_of_items));
+                  listview_items.listview_items.SelectedIndex = Math.Max(0, Math.Min(listview_items.listview_items.Items.Count - 1, listview_items.listview_items.SelectedIndex + number_of_items));
                 }
             }
             else
             {
-                if (listbox_items.Items.Count > 0)
+                if (listbox_items.listview_items.Items.Count > 0)
                 {
-                    listbox_items.SelectedIndex = Math.Max(0, Math.Min(listbox_items.Items.Count - 1, listbox_items.SelectedIndex + number_of_items));
+                 listbox_items.listview_items.SelectedIndex = Math.Max(0, Math.Min(listbox_items.listview_items.Items.Count - 1, listbox_items.listview_items.SelectedIndex + number_of_items));
                 }
             }
         }
@@ -526,7 +528,7 @@ namespace Menere.UserInterface
 
         private void filter_items()
         {
-            listbox_items.Items.Filter = delegate(object obj)
+            listbox_items.listview_items.Items.Filter = delegate(object obj)
                {
                    Model.IItem item = obj as Model.IItem;
 
@@ -577,7 +579,7 @@ namespace Menere.UserInterface
                    }
                };
 
-            listview_items.listview_items.Items.Filter = listbox_items.Items.Filter;
+            listview_items.listview_items.Items.Filter = listbox_items.listview_items.Items.Filter;
         }
 
         private void button_remove_feed_filter_Click(object sender, RoutedEventArgs e)
@@ -669,13 +671,12 @@ namespace Menere.UserInterface
             button_show_saved.IsEnabled = true;
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
-            listbox_items.ItemsSource = account.unread_items;
+            listbox_items.listview_items.ItemsSource = account.unread_items;
             listview_items.listview_items.ItemsSource = account.unread_items;
             current_shown_items = account.unread_items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
             filter_feeds();
-            //listbox_items.UpdateLayout();
         }
 
         public void button_show_saved_Click(object sender, RoutedEventArgs e)
@@ -691,8 +692,8 @@ namespace Menere.UserInterface
             button_show_saved.IsEnabled = false;
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
-            listbox_items.ItemsSource = null;
-            listbox_items.ItemsSource = account.saved_items;
+            listbox_items.listview_items.ItemsSource = null;
+            listbox_items.listview_items.ItemsSource = account.saved_items;
             listview_items.listview_items.ItemsSource = account.saved_items;
             current_shown_items = account.saved_items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
@@ -714,13 +715,12 @@ namespace Menere.UserInterface
             button_show_saved.IsEnabled = true;
 
             current_shown_items.CollectionChanged -= unread_items_CollectionChanged;
-            listbox_items.ItemsSource = account.items;
+            listbox_items.listview_items.ItemsSource = account.items;
             listview_items.listview_items.ItemsSource = account.items;
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             unread_items_CollectionChanged(null, null);
             filter_feeds();
-            //listbox_items.UpdateLayout();
         }
 
         private void button_prefernces_Click(object sender, RoutedEventArgs e)

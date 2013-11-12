@@ -9,7 +9,7 @@
         <ListView Name="listview_items"
             Background="{DynamicResource ResourceKey=color_content_background}"
             Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
-                
+             VirtualizingPanel.IsVirtualizing="True"
                  >
             <ListView.Resources>
                 <DataTemplate x:Key="FavImage">

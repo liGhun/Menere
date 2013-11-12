@@ -9,12 +9,18 @@
     <SolidColorBrush Color="#859900" x:Key="color_link"/>
     <SolidColorBrush Color="#cb4b16" x:Key="color_date"/>
     <SolidColorBrush Color="#eee8d5" x:Key="color_selected_item_background"/>
-    <SolidColorBrush Color="#eee8d5" x:Key="color_main_background"/>
+    <SolidColorBrush Color="#fdf6e3" x:Key="color_main_background"/>
     <SolidColorBrush Color="#657b83" x:Key="color_main_foreground"/>
-    <SolidColorBrush Color="#fdf6e3" x:Key="color_content_background"/>
+    <SolidColorBrush Color="#eee8d5" x:Key="color_left_background" />
+    <SolidColorBrush Color="#839496" x:Key="color_left_foreground" />
+    <SolidColorBrush Color="#fdf6e3" x:Key="color_middle_background" />
+    <SolidColorBrush Color="#657b83" x:Key="color_middle_foreground" />
+    <SolidColorBrush Color="Transparent" x:Key="color_content_background"/>
     <SolidColorBrush Color="#6c71c4" x:Key="color_feed_name_header"/>
-    <SolidColorBrush Color="#b58900" x:Key="color_active_items_list"/>
-    <SolidColorBrush Color="DarkGray" x:Key="color_border_around_item" />
+    <SolidColorBrush Color="#eee8d5" x:Key="color_active_items_list"/>
+    <SolidColorBrush Color="#002b36" x:Key="color_border_around_item" />
+
+    <SolidColorBrush Color="White" x:Key="color_background_scrollbar" />
 
     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#eee8d5" />
 
@@ -35,7 +41,7 @@
 
     <Style TargetType="Border" x:Key="theme_border_around_item">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Setter Property="BorderBrush" Value="{DynamicResource color_border_around_item}" />
         <Setter Property="Background" Value="Transparent" />
     </Style>
@@ -72,7 +78,7 @@
 
     <Style TargetType="Grid" x:Key="theme_grid_around_item">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Margin" Value="4"/>
+        <Setter Property="Margin" Value="0"/>
     </Style>
 
     <Style TargetType="GridSplitter">
@@ -108,7 +114,7 @@
     </Style>
 
     <Style TargetType="{x:Type ToolTip}">
-        <Setter Property="Background" Value="{DynamicResource ResourceKey=color_content_background}"></Setter>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=color_main_background}"></Setter>
         <Setter Property="Foreground" Value="{DynamicResource ResourceKey=color_main_foreground}"></Setter>
     </Style>
 
@@ -310,6 +316,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+
     </Style>
 
     <!--ScrollBars-->
@@ -368,6 +375,52 @@
                             <Setter TargetName="PageUp" Property="Command" Value="ScrollBar.PageRightCommand" />
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Opacity" Value="0.9" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="False">
+                <Setter Property="Opacity" Value="0.1" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+    <Style x:Key="{x:Type ScrollViewer}" TargetType="{x:Type ScrollViewer}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ScrollContentPresenter Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+                        <ScrollBar 
+                        Name="PART_VerticalScrollBar"
+                    
+                        Grid.Column="1"
+                        Value="{TemplateBinding VerticalOffset}"
+                        Maximum="{TemplateBinding ScrollableHeight}"
+                        ViewportSize="{TemplateBinding ViewportHeight}"
+                        Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+                        <ScrollBar 
+                        Name="PART_HorizontalScrollBar"
+                        Orientation="Horizontal"
+            
+                        Grid.Row="1"
+                        Value="{TemplateBinding HorizontalOffset}"
+                        Maximum="{TemplateBinding ScrollableWidth}"
+                        ViewportSize="{TemplateBinding ViewportWidth}"
+                        Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

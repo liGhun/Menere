@@ -133,6 +133,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ListBoxItems.xaml.cs">
+      <DependentUpon>ListBoxItems.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ItemContextMenu.cs" />
     <Compile Include="Controls\ListViewItems.xaml.cs">
       <DependentUpon>ListViewItems.xaml</DependentUpon>
@@ -149,6 +152,10 @@
     <Page Include="Controls\ConfigureProxy.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ListBoxItems.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Controls\EditItem.xaml">
       <SubType>Designer</SubType>
@@ -831,9 +838,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
+    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
 "C:\Program Files (x86)\NSIS\makensis.exe" "$(TargetDir)\Setup\Generate Setup.nsi"
-"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
+"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

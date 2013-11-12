@@ -181,18 +181,22 @@ namespace ShareSharp
         }
         public void load_settings(string enycrpted_settings_string, string salt)
         {
-            // Init XML reader and settings class
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(appNet_settings));
-            appNet_settings settings = new appNet_settings();
+            try
+            {
+                // Init XML reader and settings class
+                System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(appNet_settings));
+                appNet_settings settings = new appNet_settings();
 
-            // Decrypt the string
-            Crypto.set_salt(salt);
-            string settings_string = Crypto.ToInsecureString(Crypto.DecryptString(enycrpted_settings_string));
+                // Decrypt the string
+                Crypto.set_salt(salt);
+                string settings_string = Crypto.ToInsecureString(Crypto.DecryptString(enycrpted_settings_string));
 
-            // load settings
-            // note: by setting the access token Verified is set automatically in this class
-            settings = (appNet_settings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
-            this.access_token = settings.access_token;
+                // load settings
+                // note: by setting the access token Verified is set automatically in this class
+                settings = (appNet_settings)serializer.Deserialize(new System.IO.MemoryStream(Encoding.UTF8.GetBytes(settings_string)));
+                this.access_token = settings.access_token;
+            }
+            catch { }
         }
 
 

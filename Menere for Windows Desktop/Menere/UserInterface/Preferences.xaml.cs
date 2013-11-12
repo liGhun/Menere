@@ -136,5 +136,12 @@ namespace Menere.UserInterface
                 AppController.active_external_services.Remove(service);
             }
         }
+
+        private void button_add_aol_Click_1(object sender, RoutedEventArgs e)
+        {
+            Model.AolAccount aol_account = new Model.AolAccount();
+            aol_account.add_new_account();
+
+        }
     }
 }
