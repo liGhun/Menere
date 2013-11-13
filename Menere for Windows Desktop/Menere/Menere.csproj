@@ -811,6 +811,8 @@
     <None Include="Images\MenereIconSetup.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Resource Include="Images\ButtonsDark\2ColumnLayout.png" />
+    <Resource Include="Images\ButtonsDark\3ColumnLayout.png" />
     <Content Include="Setup\A\UAC.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

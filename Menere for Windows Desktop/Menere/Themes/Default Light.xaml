@@ -38,6 +38,8 @@
     <ImageSource x:Key="image_folder">/Menere;component/Images/ButtonsDark/glyphicons_144_folder_open.png</ImageSource>
     <ImageSource x:Key="image_tags">/Menere;component/Images/ButtonsDark/glyphicons_066_tags.png</ImageSource>
     <ImageSource x:Key="image_share">/Menere;component/Images/ButtonsDark/glyphicons_222_share.png</ImageSource>
+    <ImageSource x:Key="image_2column">/Menere;component/Images/ButtonsDark/2ColumnLayout.png</ImageSource>
+    <ImageSource x:Key="image_3column">/Menere;component/Images/ButtonsDark/3ColumnLayout.png</ImageSource>
 
     <Style TargetType="Border" x:Key="theme_border_around_item">
         <Setter Property="CornerRadius" Value="0" />

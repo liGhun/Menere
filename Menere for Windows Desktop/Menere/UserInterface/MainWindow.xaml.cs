@@ -742,6 +742,36 @@ namespace Menere.UserInterface
             Properties.Settings.Default.Save();
         }
 
+        private void button_2column_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.use_listView = true;
+            listbox_items.Visibility = Visibility.Collapsed;
+            listbox_items.listview_items.ItemsSource = null;
+            listview_items.listview_items.ItemsSource = current_shown_items;
+            listview_items.Visibility = Visibility.Visible;
+            border_webbrowser.SetValue(Grid.RowProperty, 1);
+            grid_middle.Width = new GridLength(0.0);
+            button_2column.IsEnabled = false;
+            button_2column.Opacity = 0.7;
+            button_3column.IsEnabled = true;
+            button_3column.Opacity = 0.4;
+        }
+
+        private void button_3column_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.use_listView = false;
+            listbox_items.Visibility = Visibility.Visible;
+            listbox_items.listview_items.ItemsSource = current_shown_items;
+            listview_items.listview_items.ItemsSource = null;
+            listview_items.Visibility = Visibility.Collapsed;
+            border_webbrowser.SetValue(Grid.RowProperty, 0);
+            grid_middle.Width = new GridLength(220.0);
+            button_2column.IsEnabled = true;
+            button_2column.Opacity = 0.4;
+            button_3column.IsEnabled = false;
+            button_3column.Opacity = 0.7;
+        }
+
    
 
     }
