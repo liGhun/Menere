@@ -19,6 +19,52 @@ namespace Menere.Controls
             {
                 ContextMenu context_menu = new ContextMenu();
 
+                MenuItem menu_mark_read = new MenuItem();
+                if (item == null)
+                {
+                    menu_mark_read.Header = "Toggle read state";
+                    menu_mark_read.Icon = get_icon("button_mark_item_read");
+                }
+                else
+                {
+                    if (item.is_read)
+                    {
+                        menu_mark_read.Header = "Mark unread";
+                        menu_mark_read.Icon = get_icon("button_mark_item_unread");
+                    }
+                    else
+                    {
+                        menu_mark_read.Header = "Mark read";
+                        menu_mark_read.Icon = get_icon("button_mark_item_read");
+                    }
+                }
+                menu_mark_read.DataContext = item;
+                menu_mark_read.Click += menu_mark_read_Click;
+                context_menu.Items.Add(menu_mark_read);
+
+                MenuItem menu_mark_save = new MenuItem();
+                if (item == null)
+                {
+                    menu_mark_save.Header = "Toggle saved state";
+                    menu_mark_save.Icon = get_icon("button_save_item");
+                }
+                else
+                {
+                    if (item.is_saved)
+                    {
+                        menu_mark_save.Header = "Mark unsaved";
+                        menu_mark_save.Icon = get_icon("button_saved_item");
+                    }
+                    else
+                    {
+                        menu_mark_save.Header = "Mark saved";
+                        menu_mark_save.Icon = get_icon("button_save_item");
+                    }
+                }
+                menu_mark_save.DataContext = item;
+                menu_mark_save.Click += menu_mark_save_Click;
+                context_menu.Items.Add(menu_mark_save);
+
                 MenuItem menu_edit_item = new MenuItem();
                 menu_edit_item.Header = "Edit item";
                 menu_edit_item.DataContext = item;
@@ -58,6 +104,90 @@ namespace Menere.Controls
             catch
             {
                 return null;
+            }
+        }
+
+        void menu_mark_read_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menu_item = sender as MenuItem;
+            if (menu_item != null)
+            {
+                IItem item = menu_item.DataContext as IItem;
+
+                if (item == null && Properties.Settings.Default.use_listView)
+                {
+                    item = AppController.Current.main_window.listview_items.listview_items.SelectedItem as IItem;
+                }
+                else
+                {
+                    item = AppController.Current.main_window.listbox_items.listview_items.SelectedItem as IItem;
+                }
+
+                if (item != null)
+                {
+                    if (item.is_read)
+                    {
+                        item.mark_unread();
+                        if (!item.receiving_account.unread_items.Contains(item))
+                        {
+                            item.receiving_account.unread_items.Add(item);
+                        }
+                        menu_item.Header = "Mark read";
+                        menu_item.Icon = get_icon("button_mark_item_read");
+                    }
+                    else
+                    {
+                        item.mark_read();
+                        if (item.receiving_account.unread_items.Contains(item))
+                        {
+                            item.receiving_account.unread_items.Remove(item);
+                        }
+                        menu_item.Header = "Mark unread";
+                        menu_item.Icon = get_icon("button_mark_item_unread");
+                    }
+                }
+            }
+        }
+
+        void menu_mark_save_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menu_item = sender as MenuItem;
+            if (menu_item != null)
+            {
+                IItem item = menu_item.DataContext as IItem;
+
+                if (item == null && Properties.Settings.Default.use_listView)
+                {
+                    item = AppController.Current.main_window.listview_items.listview_items.SelectedItem as IItem;
+                }
+                else
+                {
+                    item = AppController.Current.main_window.listbox_items.listview_items.SelectedItem as IItem;
+                }
+
+                if (item != null)
+                {
+                    if (item.is_saved)
+                    {
+                        item.mark_unsaved();
+                        if (item.receiving_account.saved_items.Contains(item))
+                        {
+                            item.receiving_account.saved_items.Remove(item);
+                        }
+                        menu_item.Header = "Mark saved";
+                        menu_item.Icon = get_icon("button_save_item");
+                    }
+                    else
+                    {
+                        item.mark_saved();
+                        if (!item.receiving_account.saved_items.Contains(item))
+                        {
+                            item.receiving_account.saved_items.Add(item);
+                        }
+                        menu_item.Header = "Mark unsaved";
+                        menu_item.Icon = get_icon("button_saved_item");
+                    }
+                }
             }
         }
 

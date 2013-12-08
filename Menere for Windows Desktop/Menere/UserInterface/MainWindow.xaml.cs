@@ -255,6 +255,9 @@ namespace Menere.UserInterface
                 " </head>\n" +
                 " <body>\n" +
                 " <div id=\"content\">\n" +
+                "  <h1><a href=\"{5}\">{0}</a></h1>\n" +
+                "  <i>{6}</i>\n" +
+                "  <hr />" +
                 "  {4}\n" +
                 " </div>\n" +
                 " <br />\n" +
@@ -262,7 +265,7 @@ namespace Menere.UserInterface
                 "  <a href=\"{5}\">Read full article</a>\n" +
                 " </div>\n" +
                 "</html>",
-                item.title, back_string, text_string, link_string, item.html, item.url);
+                item.title, back_string, text_string, link_string, item.html, item.url, item.feed.title);
             return html_content;
         }
 
