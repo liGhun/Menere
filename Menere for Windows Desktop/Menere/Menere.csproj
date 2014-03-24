@@ -817,6 +817,7 @@
     </None>
     <Resource Include="Images\ButtonsDark\2ColumnLayout.png" />
     <Resource Include="Images\ButtonsDark\3ColumnLayout.png" />
+    <Resource Include="Images\ButtonsDark\Fragezeichen Help 26px.png" />
     <Content Include="Setup\A\UAC.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -17,6 +17,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="33" Name="grid_top_right" />
             <RowDefinition Height="172" MinHeight="100" Name="grid_topRow" />
             <RowDefinition Height="*" MinHeight="100" />
         </Grid.RowDefinitions>
@@ -25,22 +26,27 @@
         <!-- Backgrounds -->
 
         <Border Grid.Column="1" 
-                Grid.Row="0" 
+                Grid.Row="1" 
                 Grid.RowSpan="2" 
                 Background="{DynamicResource ResourceKey=color_middle_background}"
                  />
         <Border Grid.Column="0" 
                 Grid.Row="0" 
-                Grid.RowSpan="2" 
+                Grid.RowSpan="3" 
                 Background="{DynamicResource ResourceKey=color_left_background}"
                  />
 
+        <Border Grid.Column="1" 
+                Grid.Row="0"
+                Grid.ColumnSpan="2"
+                Background="{DynamicResource ResourceKey=color_left_background}"
+                 />
 
 
         <ListBox Name="listbox_feeds"
             Background="{DynamicResource ResourceKey=color_content_background}" 
                  ToolTip="Select feed to filter items list"
-                 Grid.Column="0" Grid.Row="1"
+                 Grid.Column="0" Grid.Row="1" Grid.RowSpan="2"
                   Foreground="{DynamicResource ResourceKey=color_left_foreground}" 
                   Margin="10,35,0,10" HorizontalAlignment="Stretch" 
                  VerticalAlignment="Stretch" 
@@ -59,8 +65,8 @@
         <controls:ListBoxItems x:Name="listbox_items"
         Background="{DynamicResource ResourceKey=color_content_background}"
            Foreground="{DynamicResource ResourceKey=color_main_foreground}"
-                 Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-                  Margin="0,33,0,0"
+                 Grid.Column="1" Grid.Row="1" Grid.RowSpan="2"
+                  Margin="0"
             BorderBrush="Transparent" BorderThickness="0"
                  
                 VerticalAlignment="Stretch" 
@@ -92,8 +98,8 @@
         
         <!-- the traditional list view -->
         <controls:ListViewItems x:Name="listview_items"
-                                Grid.Column="2" Grid.Row="0"
-                  Margin="10,33,10,3" 
+                                Grid.Column="2" Grid.Row="1"
+                  Margin="0" 
                  VerticalAlignment="Stretch" 
                   HorizontalAlignment="Stretch"
  />
@@ -115,7 +121,7 @@
                     Foreground="{DynamicResource ResourceKey=color_left_foreground}" />
 
         <TreeView Name="listbox_groups"
-                  Grid.Column="0" Grid.Row="0"
+                  Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
                   Background="{DynamicResource ResourceKey=color_content_background}"
                  Foreground="{DynamicResource ResourceKey=color_left_foreground}" 
                  HorizontalAlignment="Stretch" Margin="10,33,00,3" 
@@ -153,15 +159,15 @@
             <Image Name="image_remove_filter_groups" Source="{DynamicResource button_remove_filter}" />
         </Button>
 
-        <VirtualizingStackPanel Name="stackPanelViews" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Left"  Height="22" Margin="4,6,0,0" Orientation="Horizontal">
+        <VirtualizingStackPanel Name="stackPanelViews" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left"  Height="22" Margin="4,6,0,0" Orientation="Horizontal">
             <Button Name="button_show_unread" Content="Unread" Margin="4,0,0,0" Height="22" VerticalAlignment="Top" Click="button_show_unread_Click"/>
             <Button Name="button_show_saved" Content="Saved" Margin="4,0,0,0.4" Height="22" VerticalAlignment="Bottom" Click="button_show_saved_Click"/>
             <Button Name="button_show_all" Content="All" Margin="4,0,0,0" Click="button_show_all_Click" />
         </VirtualizingStackPanel>
-        <Border Name="border_webbrowser" Grid.Column="2"  Margin="4,35,4,4"
-                Grid.Row="0" Grid.RowSpan="2"
+        <Border Name="border_webbrowser" Grid.Column="2"  Margin="0"
+                Grid.Row="1" Grid.RowSpan="2"
                 Background="{DynamicResource ResourceKey=color_content_background}"
-                BorderThickness="1"
+                BorderThickness="0"
                 BorderBrush="{DynamicResource ResourceKey=color_main_foreground}"
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
@@ -215,6 +221,14 @@
                 Style="{DynamicResource ResourceKey=button_without_border}"
                 ToolTip="Preferences" Click="button_prefernces_Click" >
                 <Image Name="image_preferences" Source="{DynamicResource button_preferences}"/>
+            </Button>
+            <Button Name="button_help" Grid.Column="1" 
+                MaxWidth="20" MaxHeight="20"
+                    Margin="6,0,6,0"
+                    VerticalAlignment="Center"
+                Style="{DynamicResource ResourceKey=button_without_border}"
+                ToolTip="Mark as (un)read: space or m&#x0a;Mark as (un)saved: s&#x0a;Next item: down arrow or j&#x0a;Previous item: up arrow or k&#x0a;Open full article: return&#x0a;Open article in default browser: right arrow or v&#x0a;Select filter textbox: f&#x0a;Refresh: r&#x0a;Goto...&#x0a; -> all items: ga&#x0a; -> saved items: gs&#x0a; -> unread items: gu" >
+                <Image Name="image_help" Source="{DynamicResource button_preferences}"/>
             </Button>
             <!-- <Button Name="button_add_account" Grid.Column="1" 
                 MaxWidth="20" MaxHeight="20"

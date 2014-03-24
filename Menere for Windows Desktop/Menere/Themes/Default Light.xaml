@@ -40,6 +40,7 @@
     <ImageSource x:Key="image_share">/Menere;component/Images/ButtonsDark/glyphicons_222_share.png</ImageSource>
     <ImageSource x:Key="image_2column">/Menere;component/Images/ButtonsDark/2ColumnLayout.png</ImageSource>
     <ImageSource x:Key="image_3column">/Menere;component/Images/ButtonsDark/3ColumnLayout.png</ImageSource>
+    <ImageSource x:Key="image_help">/Menere;component/Images/ButtonsDark/Fragezeichen Help 26px.png</ImageSource>
 
     <Style TargetType="Border" x:Key="theme_border_around_item">
         <Setter Property="CornerRadius" Value="0" />

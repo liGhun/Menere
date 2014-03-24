@@ -756,7 +756,7 @@ namespace Menere.UserInterface
             listview_items.listview_items.ItemsSource = current_shown_items;
             listview_items.Visibility = Visibility.Visible;
             listview_items.listview_items.SelectedItem = currently_selected_item;
-            border_webbrowser.SetValue(Grid.RowProperty, 1);
+            border_webbrowser.SetValue(Grid.RowProperty, 2);
             grid_middle.Width = new GridLength(0.0);
             button_2column.IsEnabled = false;
             button_2column.Opacity = 0.7;
@@ -773,7 +773,7 @@ namespace Menere.UserInterface
             listview_items.listview_items.ItemsSource = null;
             listview_items.Visibility = Visibility.Collapsed;
             listbox_items.listview_items.SelectedItem = currently_selected_item;
-            border_webbrowser.SetValue(Grid.RowProperty, 0);
+            border_webbrowser.SetValue(Grid.RowProperty, 1);
             grid_middle.Width = new GridLength(220.0);
             button_2column.IsEnabled = true;
             button_2column.Opacity = 0.4;
