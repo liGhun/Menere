@@ -105,6 +105,18 @@ namespace Menere.Model
                         }
                         break;
 
+                    case 97:
+                        IItem unread_item_which_is_not_unread_anymore = e.UserState as IItem;
+                        if (unread_item_which_is_not_unread_anymore != null)
+                        {
+                            if (unread_items.Contains(unread_item_which_is_not_unread_anymore))
+                            {
+                                unread_items.Remove(unread_item_which_is_not_unread_anymore);
+                            }
+                        }
+                        break;
+
+
                     case 100:
                         long? updated = e.UserState as long?;
                         if (updated != null)
@@ -389,6 +401,40 @@ namespace Menere.Model
                 backgroundWorker_update_entries.ReportProgress(100, highest_known_timestamp);
             }
 
+
+            // check if another client has marked items as read in parallel
+            Streams.entries_list unread_entries_check = Streams.get_entries_in_stream(this.token.access_token, string.Format("user/{0}/category/global.all", this.profile.id), count: 1000, unread_only: true);
+            if (unread_entries_check != null)
+            {
+                if (unread_entries_check.items != null)
+                {
+                    if (unread_entries_check.items.Count < unread_items.Count && unread_items.Count < 1000)
+                    {
+                        // there are less available in the API than we know right now already
+                        // 1000 is a limit by the API
+                        foreach (IItem currently_seen_unread_item in unread_items)
+                        {
+                            try
+                            {
+                                foreach (IItem unread_item_in_list in unread_items)
+                                {
+                                    IItem known_unread_item_which_is_not_in_the_API = unread_items.Where(item => item.id == unread_item_in_list.id).First();
+                                    if (known_unread_item_which_is_not_in_the_API == null)
+                                    {
+                                        // this one is not in the list so we will remove ist
+                                        backgroundWorker_update_entries.ReportProgress(97, unread_item_in_list);
+                                    }
+                                }
+                            }
+                            catch (Exception exp)
+                            {
+                                AppController.add_debug_message(exp);
+                            }
+                        }
+                    
+                    }
+                }
+            }
 
             fetched_feeds = null;
             known_items = null;

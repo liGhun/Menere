@@ -33,7 +33,8 @@ namespace Menere.UserInterface
         public string current_filter_string { get; set; }
         public Model.IFeed current_filter_feed { get; set; }
         public Model.IFolder current_filter_folder { get; set; }
-        private int last_selected_index { get; set; }
+        private int last_selected_index_listview { get; set; }
+        private int last_selected_index_listbox { get; set; }
         public ObservableCollection<IItem> current_shown_items { get; set; }
         private bool goto_button_pressed { get; set; }
 
@@ -135,13 +136,13 @@ namespace Menere.UserInterface
             Model.IItem item = listbox_items.listview_items.SelectedItem as Model.IItem;
             if (item == null && listbox_items.listview_items.Items.Count > 0)
             {
-                listbox_items.listview_items.SelectedIndex = Math.Min(last_selected_index,Math.Max(0, listbox_items.listview_items.Items.Count - 1));
+                listbox_items.listview_items.SelectedIndex = Math.Min(last_selected_index_listbox,Math.Max(0, listbox_items.listview_items.Items.Count - 1));
                 return;
             }
 
             if (listbox_items.listview_items.SelectedItem != null)
             {
-                last_selected_index = Math.Max(0, listbox_items.listview_items.SelectedIndex);
+                last_selected_index_listbox = Math.Max(0, listbox_items.listview_items.SelectedIndex);
             }
 
             if (item != null)
@@ -169,15 +170,15 @@ namespace Menere.UserInterface
         void listview_items_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Model.IItem item = listview_items.listview_items.SelectedItem as Model.IItem;
-            if (item == null && listbox_items.listview_items.Items.Count > 0)
+            if (item == null && listview_items.listview_items.Items.Count > 0)
             {
-                listview_items.listview_items.SelectedIndex = Math.Min(last_selected_index, Math.Max(0, listview_items.listview_items.Items.Count - 1));
+                listview_items.listview_items.SelectedIndex = Math.Min(last_selected_index_listview, Math.Max(0, listview_items.listview_items.Items.Count - 1));
                 return;
             }
 
             if (listbox_items.listview_items.SelectedItem != null)
             {
-                last_selected_index = Math.Max(0, listview_items.listview_items.SelectedIndex);
+                last_selected_index_listview = Math.Max(0, listview_items.listview_items.SelectedIndex);
             }
 
             if (item != null)
@@ -229,6 +230,7 @@ namespace Menere.UserInterface
         {
             foreach (IAccount account_available in AppController.accounts)
             {
+                AppController.Current.snarl_interface.Notify("Refresh clicked");
                 account_available.update_all_feeds();
             }
         }
@@ -748,10 +750,12 @@ namespace Menere.UserInterface
         private void button_2column_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.use_listView = true;
+            IItem currently_selected_item = listbox_items.listview_items.SelectedItem as IItem;
             listbox_items.Visibility = Visibility.Collapsed;
             listbox_items.listview_items.ItemsSource = null;
             listview_items.listview_items.ItemsSource = current_shown_items;
             listview_items.Visibility = Visibility.Visible;
+            listview_items.listview_items.SelectedItem = currently_selected_item;
             border_webbrowser.SetValue(Grid.RowProperty, 1);
             grid_middle.Width = new GridLength(0.0);
             button_2column.IsEnabled = false;
@@ -762,11 +766,13 @@ namespace Menere.UserInterface
 
         private void button_3column_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.use_listView = false;
+            Properties.Settings.Default.use_listView = false; 
+            IItem currently_selected_item = listview_items.listview_items.SelectedItem as IItem;
             listbox_items.Visibility = Visibility.Visible;
             listbox_items.listview_items.ItemsSource = current_shown_items;
             listview_items.listview_items.ItemsSource = null;
             listview_items.Visibility = Visibility.Collapsed;
+            listbox_items.listview_items.SelectedItem = currently_selected_item;
             border_webbrowser.SetValue(Grid.RowProperty, 0);
             grid_middle.Width = new GridLength(220.0);
             button_2column.IsEnabled = true;

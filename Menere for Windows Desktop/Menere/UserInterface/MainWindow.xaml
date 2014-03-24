@@ -184,18 +184,20 @@
                                Watermark="Search in entries..." TextChanged="textbox_filter_text_TextChanged" HorizontalAlignment="Right" VerticalAlignment="Top" Width="195"/>
             <Button MaxHeight="20" MaxWidth="20" 
                     Margin="6,0,0,0"
+                    ToolTip="Switch to 2-column layout"
                 Style="{DynamicResource ResourceKey=button_without_border}"
-                Name="button_2column" ToolTip="Use 2 column layout" HorizontalAlignment="Right" VerticalAlignment="Center"
+                Name="button_2column" HorizontalAlignment="Right" VerticalAlignment="Center"
                     Click="button_2column_Click">
                 <Image Name="image_2column" Source="{DynamicResource image_2column}"/>
             </Button>
             <Button MaxHeight="20" MaxWidth="20" 
+                    ToolTip="Switch to 3-column layout"
                     Margin="6,0,0,0"
                     IsEnabled="False"
                     Opacity="1"
                 Style="{DynamicResource ResourceKey=button_without_border}"
                     Click="button_3column_Click"
-                Name="button_3column" ToolTip="Use 2 column layout" HorizontalAlignment="Right" VerticalAlignment="Center">
+                Name="button_3column" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Image Name="image_3column" Source="{DynamicResource image_3column}"
                        />
             </Button>

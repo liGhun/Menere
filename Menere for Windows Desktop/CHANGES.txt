@@ -1,3 +1,11 @@
+1.0
+New design with a three column layout
+Switching layout now remembers the currently selected item
+Keyboard shortcuts now work seemless on both layouts
+Fever: if an entry is marked as read in another client / WebGUI Menere now removes it on next refresh automatically
+ Feedly: same here but needs more testing
+Fix: infinite loop on Fever initial item retrieval removed
+
 0.9
 Setup file and executable are now digitally signed
 When sending a post to e.g. App.net the html entities are now converted to readable characters

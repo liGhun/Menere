@@ -288,6 +288,17 @@ namespace Menere.Model
                         }
                         break;
 
+                        // unerad item in list which is not in the list by the API (external marked as read)
+                    case 97:
+                        FeverItem unread_item_which_is_not_unread_anymore = e.UserState as FeverItem;
+                        if (unread_item_which_is_not_unread_anymore != null)
+                        {
+                            if(unread_items.Contains(unread_item_which_is_not_unread_anymore)) {
+                                unread_items.Remove(unread_item_which_is_not_unread_anymore);
+                            }
+                        }
+                        break;
+
                     case 99:
                         uint? last_updated = e.UserState as uint?;
                         if (last_updated != null)
@@ -331,6 +342,7 @@ namespace Menere.Model
                 fetched_feeds.Add(feed.id, feed);
             }
 
+            #region first fetch
             if (!first_fetch_completed)
             {
                 SharpFever.Model.FeverResponse unread_items_ids = fever_account.get_unread_item_ids();
@@ -392,13 +404,18 @@ namespace Menere.Model
                // first_fetch_completed = true;
                // initial_fetch_completed = true;
             }
-            
+            #endregion
+
             uint max_id = this.max_id_fetched;
             FeverResponse entries = new FeverResponse();
             entries.items = new ObservableCollection<Item>();
+            uint last_id = 0;
+            uint current_id = 1;
               do {
                   entries = fever_account.get_items(since_id:Convert.ToInt32(max_id));
-                  if(entries == null) {return;}
+                  last_id = current_id;
+                  current_id = max_id;
+                  if (entries == null) { break; }
                     foreach (SharpFever.Model.Item entry in entries.items)
                     {
                         if(known_items.ContainsKey(entry.id.ToString())) 
@@ -454,8 +471,34 @@ namespace Menere.Model
                         }
 
                     }
-              } while (entries.items.Count > 0);
+              } while (entries.items.Count > 0 && current_id != last_id);
 
+            // check if another client has marked items as read in parallel
+            FeverResponse check_number_unread_response = fever_account.get_unread_item_ids();
+            if (check_number_unread_response != null)
+            {
+                if (check_number_unread_response.unread_item_ids_list != null)
+                {
+                    if (check_number_unread_response.unread_item_ids_list.Count < unread_items.Count && unread_items.Count < 1000)
+                    {
+                        // there are less available in the API than we know right now already
+                        // 1000 is a limit by the API
+                        foreach (IItem currently_seen_unread_item in unread_items)
+                        {
+                            if (!check_number_unread_response.unread_item_ids_list.Contains(Convert.ToUInt32(currently_seen_unread_item.id)))
+                            {
+                                // this one is not in the list so we will remove ist
+                                try {
+                                backgroundWorker_update_entries.ReportProgress(97, unread_items.Where(item => item.id == currently_seen_unread_item.id).First());
+                                }
+                                catch (Exception exp) {
+                                    AppController.add_debug_message(exp);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private BackgroundWorker backgroundWorker_update_entries;
