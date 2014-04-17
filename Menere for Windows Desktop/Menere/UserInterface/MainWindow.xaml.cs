@@ -72,6 +72,7 @@ namespace Menere.UserInterface
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
             webbrowser.Navigated += webbrowser_Navigated;
+            webbrowser.Navigating += webbrowser_Navigating;
             textblock_item_title.Text = "";
 
             if (Properties.Settings.Default.windowHeight > 0 && Properties.Settings.Default.windowWidth > 0)
@@ -97,7 +98,15 @@ namespace Menere.UserInterface
             update_timer.Start();
         }
 
+        void webbrowser_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            
+        }
 
+        private void webbrowser_cancel_current_navigation()
+        {
+            
+        }
 
 
 
@@ -230,7 +239,7 @@ namespace Menere.UserInterface
         {
             foreach (IAccount account_available in AppController.accounts)
             {
-                AppController.Current.snarl_interface.Notify("Refresh clicked");
+                //AppController.Current.snarl_interface.Notify("Refresh clicked");
                 account_available.update_all_feeds();
             }
         }
@@ -781,7 +790,52 @@ namespace Menere.UserInterface
             button_3column.Opacity = 0.7;
         }
 
-   
+        private void navigate_to_url(string url)
+        {
+            
+        }
 
+
+        private class browser_navigation_cache
+        {
+            public string url {
+                get
+                {
+                    return _url;
+                }
+                set
+                {
+                    if(!string.IsNullOrEmpty(value)) {
+                        html_to_be_rendered = null;
+                    }
+                    _url = value;
+                }
+            }
+            private string _url { get; set; }
+
+            public string html_to_be_rendered
+            {
+                get
+            
+                {
+                    return _html_to_be_rendered;
+                }
+                set
+                {
+                    if(!string.IsNullOrEmpty(value)) {
+                        url = null;
+                    }
+                    _html_to_be_rendered = value;
+                }
+            }
+            private string _html_to_be_rendered { get; set; }
+
+            public void clear()
+            {
+                url = null;
+                html_to_be_rendered = null;
+            }
+
+        }
     }
 }
