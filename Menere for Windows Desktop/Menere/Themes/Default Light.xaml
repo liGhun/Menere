@@ -14,6 +14,7 @@
     <SolidColorBrush Color="#eee8d5" x:Key="color_left_background" />
     <SolidColorBrush Color="#839496" x:Key="color_left_foreground" />
     <SolidColorBrush Color="#fdf6e3" x:Key="color_middle_background" />
+    <SolidColorBrush Color="#fff8e5" x:Key="color_middle_alternate_background" />
     <SolidColorBrush Color="#657b83" x:Key="color_middle_foreground" />
     <SolidColorBrush Color="Transparent" x:Key="color_content_background"/>
     <SolidColorBrush Color="#6c71c4" x:Key="color_feed_name_header"/>
@@ -40,7 +41,7 @@
     <ImageSource x:Key="image_share">/Menere;component/Images/ButtonsDark/glyphicons_222_share.png</ImageSource>
     <ImageSource x:Key="image_2column">/Menere;component/Images/ButtonsDark/2ColumnLayout.png</ImageSource>
     <ImageSource x:Key="image_3column">/Menere;component/Images/ButtonsDark/3ColumnLayout.png</ImageSource>
-    <ImageSource x:Key="image_help">/Menere;component/Images/ButtonsDark/Fragezeichen Help 26px.png</ImageSource>
+    <ImageSource x:Key="image_help">/Menere;component/Images/ButtonsDark/FragezeichenHelp26px.png</ImageSource>
 
     <Style TargetType="Border" x:Key="theme_border_around_item">
         <Setter Property="CornerRadius" Value="0" />
@@ -205,6 +206,35 @@
             </Setter.Value>
         </Setter>
 
+    </Style>
+
+    <Style x:Key="alternatingListViewItemStyle" TargetType="{x:Type ListViewItem}">
+        <!--<Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                    <Border
+                             x:Name="Border"
+                             BorderBrush="Transparent"
+                             BorderThickness="1">
+                        <GridViewRowPresenter Columns="{TemplateBinding GridView.ColumnCollection}" Content="{TemplateBinding Content}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="true">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="#d33682"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter> -->
+        <Style.Triggers>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=color_middle_alternate_background}"></Setter>
+            </Trigger>
+            <Trigger Property="ItemsControl.AlternationIndex" Value="2">
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=color_middle_background}"></Setter>
+            </Trigger>
+        </Style.Triggers>
+        
     </Style>
 
     <Style TargetType="{x:Type TextBox}">

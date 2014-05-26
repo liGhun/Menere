@@ -63,9 +63,11 @@ namespace Menere.ExternalServices
                         Tuple<Token, ApiCallResponse> response = Tokens.get(e.accessToken);
                         if (response.Item2.success && response.Item1 != null)
                         {
-                            if (response.Item1.user != null) ;
-                            access_token = e.accessToken;
-                            user = response.Item1.user;
+                            if (response.Item1.user != null)
+                            {
+                                access_token = e.accessToken;
+                                user = response.Item1.user;
+                            }
                             //AppController.available_external_services.Add(this);
                         }
 

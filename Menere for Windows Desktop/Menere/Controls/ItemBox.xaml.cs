@@ -106,7 +106,8 @@ namespace Menere.Controls
                     IItem item = this.DataContext as IItem;
                     if (item != null)
                     {
-                        AppController.Current.main_window.webbrowser.Navigate(item.url);
+                        AppController.Current.main_window.webbroser_navigate_to_url(item.url);
+                       
                     }
                 }
             }

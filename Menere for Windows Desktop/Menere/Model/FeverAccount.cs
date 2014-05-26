@@ -510,7 +510,7 @@ namespace Menere.Model
                 saved_items.Clear();
                 unread_items.Clear();
                 items.Clear();
-                if (backgroundWorker_update_entries.IsBusy != null)
+                if (backgroundWorker_update_entries.IsBusy)
                 {
                     backgroundWorker_update_entries.CancelAsync();
                 }

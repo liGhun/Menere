@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Threading;
 using Menere.Model;
+using Awesomium.Core;
 
 namespace Menere.UserInterface
 {
@@ -26,6 +27,7 @@ namespace Menere.UserInterface
     /// </summary>
     public partial class MainWindow : Window
     {
+        
 
         public Model.IAccount account;
         
@@ -39,6 +41,7 @@ namespace Menere.UserInterface
         private bool goto_button_pressed { get; set; }
 
 
+        
         
         public MainWindow()
         {
@@ -71,8 +74,9 @@ namespace Menere.UserInterface
 
             current_shown_items = account.items;
             current_shown_items.CollectionChanged += unread_items_CollectionChanged;
-            webbrowser.Navigated += webbrowser_Navigated;
-            webbrowser.Navigating += webbrowser_Navigating;
+            
+
+            
             textblock_item_title.Text = "";
 
             if (Properties.Settings.Default.windowHeight > 0 && Properties.Settings.Default.windowWidth > 0)
@@ -160,18 +164,18 @@ namespace Menere.UserInterface
                 textblock_feed_title.Text = item.feed.title;
                 if (string.IsNullOrWhiteSpace(item.html) || item.title.ToLower().Trim() == item.html.ToLower().Trim())
                 {
-                    webbrowser.Navigate(item.url);
+                    webbroser_navigate_to_url(item.url);
                 }
                 else
                 {
-                    webbrowser.NavigateToString(create_html_content(item));
+                    webbroser_navigate_to_html_string(create_html_content(item));
                 }
             }
             else
             {
                 textblock_feed_title.Text = "";
                 textblock_item_title.Text = "";
-                webbrowser.NavigateToString("&nbsp;");
+                webbroser_navigate_clear();
             }
         
         }
@@ -196,18 +200,18 @@ namespace Menere.UserInterface
                 textblock_feed_title.Text = item.feed.title;
                 if (string.IsNullOrWhiteSpace(item.html) || item.title.ToLower().Trim() == item.html.ToLower().Trim())
                 {
-                    webbrowser.Navigate(item.url);
+                    webbroser_navigate_to_url(item.url);
                 }
                 else
                 {
-                    webbrowser.NavigateToString(create_html_content(item));
+                    webbroser_navigate_to_html_string(create_html_content(item));
                 }
             }
             else
             {
                 textblock_feed_title.Text = "";
                 textblock_item_title.Text = "";
-                webbrowser.NavigateToString("&nbsp;");
+                webbroser_navigate_clear();
             }
         }
 
@@ -230,9 +234,10 @@ namespace Menere.UserInterface
         }
 
 
-        void webbrowser_Navigated(object sender, NavigationEventArgs e)
+        void webbrowser_Navigated(object sender, Awesomium.Core.NavigationEventArgs e)
         {
-            HideScriptErrors(webbrowser, true);
+            
+
         }
 
         public  void button_refresh_Click(object sender, RoutedEventArgs e)
@@ -246,12 +251,12 @@ namespace Menere.UserInterface
 
         private string create_html_content(Model.IItem item)
         {
-            SolidColorBrush background = System.Windows.Application.Current.Resources["color_content_background"] as SolidColorBrush;
+            SolidColorBrush background = System.Windows.Application.Current.Resources["color_middle_background"] as SolidColorBrush;
             SolidColorBrush text_color = System.Windows.Application.Current.Resources["color_main_foreground"] as SolidColorBrush;
             SolidColorBrush link_color = System.Windows.Application.Current.Resources["color_link"] as SolidColorBrush;
             string back_string = "#" + background.ToString().Substring(3);
-            string text_string = "#" + text_color.ToString().Substring(3);;
-            string link_string = "#" + link_color.ToString().Substring(3);;
+            string text_string = "#" + text_color.ToString().Substring(3);
+            string link_string = "#" + link_color.ToString().Substring(3);
             string html_content = string.Format(
                 "<html>\n " +
                 " <head>\n" +
@@ -259,7 +264,7 @@ namespace Menere.UserInterface
                 "  <title>{0}</title>\n" +
                 "  <style type=\"text/css\">\n" +
                 "   <!--\n" +
-                "    html {{ background: {1}; color:{2} }}\n" +
+                "    html {{ background: {1}; color:{2}; font-size:133% }}\n" +
                 "    a {{ color:{3} }}\n" +
                 "   -->\n" +
                 "  </style>\n" +
@@ -371,7 +376,7 @@ namespace Menere.UserInterface
 
                     if (item != null)
                     {
-                        webbrowser.Navigate(item.url);
+                        webbroser_navigate_to_url(item.url);
                     }
                 }
 
@@ -783,59 +788,29 @@ namespace Menere.UserInterface
             listview_items.Visibility = Visibility.Collapsed;
             listbox_items.listview_items.SelectedItem = currently_selected_item;
             border_webbrowser.SetValue(Grid.RowProperty, 1);
-            grid_middle.Width = new GridLength(220.0);
+            grid_middle.Width = new GridLength(240.0);
             button_2column.IsEnabled = true;
             button_2column.Opacity = 0.4;
             button_3column.IsEnabled = false;
             button_3column.Opacity = 0.7;
         }
 
-        private void navigate_to_url(string url)
+        public void webbroser_navigate_to_url(string url)
         {
-            
+            awesomium_webbrowser.Source = new Uri(url);
         }
 
-
-        private class browser_navigation_cache
+        public void webbroser_navigate_to_html_string(string html_string)
         {
-            public string url {
-                get
-                {
-                    return _url;
-                }
-                set
-                {
-                    if(!string.IsNullOrEmpty(value)) {
-                        html_to_be_rendered = null;
-                    }
-                    _url = value;
-                }
-            }
-            private string _url { get; set; }
-
-            public string html_to_be_rendered
-            {
-                get
-            
-                {
-                    return _html_to_be_rendered;
-                }
-                set
-                {
-                    if(!string.IsNullOrEmpty(value)) {
-                        url = null;
-                    }
-                    _html_to_be_rendered = value;
-                }
-            }
-            private string _html_to_be_rendered { get; set; }
-
-            public void clear()
-            {
-                url = null;
-                html_to_be_rendered = null;
-            }
-
+            awesomium_webbrowser.LoadHTML(html_string);
         }
+
+        public void webbroser_navigate_clear()
+        {
+            awesomium_webbrowser.LoadHTML("&nbsp;");
+        }
+
+        
+        
     }
 }

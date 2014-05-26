@@ -8,7 +8,8 @@
     <Grid Margin="0">
         <ListView Name="listview_items"
                   AlternationCount="2"
-            Background="{DynamicResource ResourceKey=color_content_background}"
+                  ItemContainerStyle="{StaticResource alternatingListViewItemStyle}"
+            
             Foreground="{DynamicResource ResourceKey=color_main_foreground}" 
              VirtualizingPanel.IsVirtualizing="True"
                   VerticalContentAlignment="Top"
@@ -23,15 +24,10 @@
                     <Setter Property="Visibility" Value="Collapsed" />
                 </Style>
                 <DataTemplate x:Key="FavImage">
-                    <VirtualizingStackPanel Orientation="Horizontal" VirtualizingPanel.IsVirtualizing="True"
-                        VirtualizingPanel.VirtualizationMode="Recycling"
-                        ScrollViewer.CanContentScroll="True"
-                                            VerticalAlignment="Top">
-                        <Image Source="{Binding Path=feed.icon_path}" Height="16" MaxWidth="16" VerticalAlignment="Top" />
-                    </VirtualizingStackPanel>
+                        <Image Source="{Binding Path=feed.icon_path}" Width="12" VerticalAlignment="Top" Margin="0" />
                 </DataTemplate>
                 <DataTemplate x:Key="ItemContent">
-                    <VirtualizingStackPanel Orientation="Vertical" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True">
+                    <VirtualizingStackPanel Orientation="Vertical" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling" ScrollViewer.CanContentScroll="True" Margin="2,0,6,0">
                         <TextBlock Name="textblock_feedtitle"  Text="{Binding Path=feed.title}" TextWrapping="Wrap" FontSize="10" Foreground="{DynamicResource ResourceKey=color_feed_name_header}"/>
                         <TextBlock Name="textblock_title" TextWrapping="Wrap" Text="{Binding Path=title}" Foreground="{DynamicResource ResourceKey=color_main_foreground}"/>
                         <TextBlock Name="textblock_date" FontSize="9" Text="{Binding Path=created}" Foreground="{DynamicResource ResourceKey=color_date}" Margin="0,0,10,0"/>
@@ -49,7 +45,7 @@
 
                     <GridViewColumn 
                         x:Name="ItemContent" 
-                         Width="196"
+                         Width="211"
                         CellTemplate="{StaticResource ItemContent}"
                         />
                 </GridView>

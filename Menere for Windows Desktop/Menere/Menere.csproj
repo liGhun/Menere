@@ -28,8 +28,8 @@
     <SupportUrl>http://www.li-ghun.de/</SupportUrl>
     <ProductName>Meneré</ProductName>
     <PublisherName>lI%27 Ghun %28Sven Walther%29</PublisherName>
-    <ApplicationRevision>3</ApplicationRevision>
-    <ApplicationVersion>0.9.0.%2a</ApplicationVersion>
+    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationVersion>0.9.2.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -45,7 +45,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -60,8 +60,7 @@
     <ManifestCertificateThumbprint>F5ED646021DDC6CD241D514B5227523DBCDDD20D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>
-    </ManifestKeyFile>
+    <ManifestKeyFile>codesign.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -84,6 +83,12 @@
     <Reference Include="AppNetDotNet, Version=1.8.1.0, Culture=neutral, PublicKeyToken=c5ee942792c9b1c6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AppNet.NET.1.8.1.0\lib\net40-full\AppNetDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="Awesomium.Core, Version=1.7.4.2, Culture=neutral, PublicKeyToken=e1a0d7c8071a5214, processorArchitecture=x86">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="awesomium.windows.controls, Version=1.7.4.2, Culture=neutral, PublicKeyToken=7a34e179b8b61c39, processorArchitecture=x86">
+      <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -295,7 +300,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="codesign.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -816,7 +823,7 @@
     </None>
     <Resource Include="Images\ButtonsDark\2ColumnLayout.png" />
     <Resource Include="Images\ButtonsDark\3ColumnLayout.png" />
-    <Resource Include="Images\ButtonsDark\Fragezeichen Help 26px.png" />
+    <Resource Include="Images\ButtonsDark\FragezeichenHelp26px.png" />
     <Content Include="Setup\A\UAC.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -844,9 +851,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM "C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
-REM "C:\Program Files (x86)\NSIS\makensis.exe" "$(TargetDir)\Setup\Generate Setup.nsi"
-REM "C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
+    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Menere" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
+"C:\Program Files (x86)\NSIS\makensis.exe" "$(TargetDir)\Setup\Generate Setup.nsi"
+"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
