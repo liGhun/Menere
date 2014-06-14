@@ -169,9 +169,9 @@
         </Button>
 
         <VirtualizingStackPanel x:Name="stackPanelViews" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left"  Height="22" Margin="4,6,0,0" Orientation="Horizontal">
-            <Button x:Name="button_show_unread" Content="Unread" Margin="4,0,0,0" Height="22" VerticalAlignment="Top" Click="button_show_unread_Click"/>
-            <Button x:Name="button_show_saved" Content="Saved" Margin="4,0,0,0.4" Height="22" VerticalAlignment="Bottom" Click="button_show_saved_Click"/>
-            <Button x:Name="button_show_all" Content="All" Margin="4,0,0,0" Click="button_show_all_Click" />
+            <Button x:Name="button_show_unread" Content="Unread" Margin="4,0,0,0" Height="22" MinWidth="60" VerticalAlignment="Top" Click="button_show_unread_Click"/>
+            <Button x:Name="button_show_saved" Content="Saved" Margin="4,0,0,0.4" Height="22" MinWidth="60" VerticalAlignment="Bottom" Click="button_show_saved_Click"/>
+            <Button x:Name="button_show_all" Content="All" MinWidth="60" Margin="4,0,0,0" Click="button_show_all_Click" />
         </VirtualizingStackPanel>
         <Border x:Name="border_webbrowser" Grid.Column="2"  Margin="0"
 			Grid.Row="1" Grid.RowSpan="2"

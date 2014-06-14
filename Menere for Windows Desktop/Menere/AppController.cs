@@ -58,10 +58,10 @@ namespace Menere
             available_account_types = new ObservableCollection<IAccount>();
             available_account_types.Add(new Model.FeverAccount());
             available_account_types.Add(new Model.FeedlyAccount());
-            available_account_types.Add(new Model.AolAccount());
-            available_account_types.Add(new Model.FeedbinAccount());
-            available_account_types.Add(new Model.TinyTinyAccount());
-            available_account_types.Add(new Model.CommaFeedAccount());
+           // available_account_types.Add(new Model.AolAccount());
+           // available_account_types.Add(new Model.FeedbinAccount());
+           // available_account_types.Add(new Model.TinyTinyAccount());
+           // available_account_types.Add(new Model.CommaFeedAccount());
 
             accounts = new ObservableCollection<IAccount>();
             accounts.CollectionChanged += accounts_CollectionChanged;

@@ -22,7 +22,7 @@
                     <StackPanel Name="stackpanel_account_buttons" Orientation="Vertical" Grid.Column="1" Grid.Row="1">
                         <Button Name="button_add_feedly" Content="+ Feedly" Click="button_add_feedly_Click" />
                         <Button Name="button_add_fever" Content="+ Fever" Click="button_add_fever_Click" />
-                        <Button Name="button_add_aol" Content="+ AOL" Click="button_add_aol_Click_1" />
+                        <!-- <Button Name="button_add_aol" Content="+ AOL" Click="button_add_aol_Click_1" /> -->
                         <Button Name="button_remove_rss_account" Content="- Remove" Margin="0,10,0,0" IsEnabled="False" Click="button_remove_rss_account_Click" />
                     </StackPanel>
                 </Grid>
