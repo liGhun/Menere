@@ -708,5 +708,14 @@ namespace Menere.Model
             }
             catch { }
         }
+
+        public string username_for_license
+        {
+            get
+            {
+                string username = this.profile.id.ToLower().Trim();
+                return username;
+            }
+        }
     }
 }

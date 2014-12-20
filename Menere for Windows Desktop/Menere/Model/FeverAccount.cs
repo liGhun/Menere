@@ -521,5 +521,17 @@ namespace Menere.Model
             }
             catch { }
         }
+
+        public string username_for_license { 
+            get
+            {
+                string username = this.url.Trim().TrimEnd('/').ToLower();
+                username = username.Replace("http://", "");
+                username = username.Replace("https://", "");
+                username += "-";
+                username += this.email.ToLower().Trim();
+                return username;
+            }
+        }
     }
 }

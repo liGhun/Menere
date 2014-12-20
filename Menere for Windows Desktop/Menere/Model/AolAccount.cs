@@ -139,5 +139,14 @@ namespace Menere.Model
                 System.Windows.MessageBox.Show(e.error, "Error adding AOL account");
             }
         }
+
+        public string username_for_license
+        {
+            get
+            {
+                throw new NotImplementedException();
+                return null;
+            }
+        }
     }
 }

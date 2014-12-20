@@ -12,6 +12,7 @@ namespace Menere.Model
         string type { get;}
         string icon_path { get;}
         string name { get; set; }
+        string username_for_license { get; }
         bool initial_fetch_completed { get; set; }
         ObservableCollection<IFeed> feeds { get; set; }
         ObservableCollection<IItem> items { get; set; }

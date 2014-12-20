@@ -114,5 +114,14 @@ namespace Menere.Model
                 throw new NotImplementedException();
             }
         }
+
+        public string username_for_license
+        {
+            get
+            {
+                throw new NotImplementedException();
+                return null;
+            }
+        }
     }
 }

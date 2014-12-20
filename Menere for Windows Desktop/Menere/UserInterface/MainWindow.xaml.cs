@@ -810,6 +810,18 @@ namespace Menere.UserInterface
             awesomium_webbrowser.LoadHTML("&nbsp;");
         }
 
+        private void buyMenere_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start("http://www.li-ghun.de/menere_get_license");
+            }
+            catch
+            {
+                MessageBox.Show("Please visit the Menere homepage");
+            }
+        }
+
         
         
     }

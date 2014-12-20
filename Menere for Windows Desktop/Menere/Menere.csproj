@@ -148,7 +148,9 @@
     <Compile Include="Controls\ListViewItems.xaml.cs">
       <DependentUpon>ListViewItems.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OpaqueClickableImage.cs" />
     <Compile Include="Helper\Texts.cs" />
+    <Compile Include="License\LicenseCheck.cs" />
     <Compile Include="Model\AolAccount.cs" />
     <Compile Include="UserInterface\Preferences.xaml.cs">
       <DependentUpon>Preferences.xaml</DependentUpon>
@@ -824,6 +826,8 @@
     <Resource Include="Images\ButtonsDark\2ColumnLayout.png" />
     <Resource Include="Images\ButtonsDark\3ColumnLayout.png" />
     <Resource Include="Images\ButtonsDark\FragezeichenHelp26px.png" />
+    <Resource Include="Images\Buy Menere.png" />
+    <Resource Include="Buy Menere.png" />
     <Content Include="Setup\A\UAC.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -851,9 +855,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Menere" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
+    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe" sign /d "Menere" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetPath)"
 "C:\Program Files (x86)\NSIS\makensis.exe" "$(TargetDir)\Setup\Generate Setup.nsi"
-"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
+"C:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe" sign /d "Chapper" /du "http://www.li-ghun.de/menere" /f "C:\Users\Sven\Dropbox\Development\Zertifikate\codesign.pfx" /v "$(TargetDir)\Setup\Setup-Menere.exe"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

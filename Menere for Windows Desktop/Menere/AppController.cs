@@ -54,6 +54,7 @@ namespace Menere
             System.Windows.FrameworkElement.LanguageProperty.OverrideMetadata(typeof(System.Windows.FrameworkElement),
                 new System.Windows.FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
 
+            Properties.Settings.Default.isValidLicense = false;
 
             available_account_types = new ObservableCollection<IAccount>();
             available_account_types.Add(new Model.FeverAccount());
@@ -124,6 +125,10 @@ namespace Menere
                                     fever_account.load_settings(Helper.Crypto.ToInsecureString(Helper.Crypto.DecryptString(account_data[1])));
                                     if (fever_account.check_credentials())
                                     {
+                                        if (!Properties.Settings.Default.isValidLicense)
+                                        {
+                                            LicenseChecker.checkLicense(fever_account.username_for_license, Properties.Settings.Default.licenseCode);
+                                        }
                                         accounts.Add(fever_account);
                                     }
                                     
@@ -134,6 +139,10 @@ namespace Menere
                                     feedly_account.load_settings(Helper.Crypto.ToInsecureString(Helper.Crypto.DecryptString(account_data[1])));
                                     if (feedly_account.check_credentials())
                                     {
+                                        if (!Properties.Settings.Default.isValidLicense)
+                                        {
+                                            LicenseChecker.checkLicense(feedly_account.username_for_license, Properties.Settings.Default.licenseCode);
+                                        }
                                         accounts.Add(feedly_account);
                                         
                                     }
@@ -243,6 +252,10 @@ namespace Menere
             if (main_window != null && accounts.Count > 0)
             {
                 main_window.Show();
+                if (Properties.Settings.Default.isValidLicense)
+                {
+                    main_window.buyMenere.Visibility = System.Windows.Visibility.Collapsed;
+                }
             }
             if (all_accounts_read)
             {

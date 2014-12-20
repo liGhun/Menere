@@ -256,5 +256,22 @@
             <TextBox  FontSize="13" FontWeight="Bold" Foreground="White" ToolTip="Click to open the webpage for the purchase. Thank you!">Please consider buying a license code...</TextBox>
         </Button>
 -->
+
+        <controls:OpaqueClickableImage HorizontalAlignment="Left" 
+                                               Height="128" 
+                                               x:Name="buyMenere"
+                                               Margin="0" 
+                                               VerticalAlignment="Bottom" 
+                                               Width="128" 
+                                               Grid.Row="2"
+                                               Grid.Column="0"
+                                               
+                                               Source="/Menere;component/Images/Buy Menere.png"
+                                               MouseDown="buyMenere_MouseDown"
+                                               Cursor="Hand"
+                                               ToolTip="Please click here to buy a license for Menere. Thanks in advance."
+                                               Opacity="0.7"/>
+        
+
     </Grid>
 </Window>
